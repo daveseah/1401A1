@@ -1,35 +1,39 @@
-# Engine 1401A1
+#### PROJECT SUMMARY
 
-This is a HTML5/Javascript **video game framework + build environment** for explaining webapp development concepts and making web-based educational applications.
+Engine 1401A1 is a HTML5/Javascript **video game framework + build environment** for explaining webapp development concepts and making web-based educational applications.
 
 It is the continuation of [Project 1401](https://github.com/daveseah/project-1401), my ongoing challenge to create a well-documented, elegant, and expressive code architecture that appeals to my coding preferences.
 
-## Quick Start
+#### QUICK START
 
-You will be using a **terminal** window to issue all the following instructions. Install **Git** and **Node** if you haven't already. 
+Install **Git** and **Node** if you haven't already. You will be using a **terminal** window to issue all following instructions from the command line.
 
-You will need to install the Node package **gulp-cli** once globally: 
+(1) If you haven't already installed **gulp-cli**, do so now:
 ```
-    > npm install -g gulp-cli
+  > npm install -g gulp-cli
 ```
-Next clone the repository from **Github** into a directory. I use ~dseah/dev on my Mac, but you can use anything you want. 
-```
-    > cd /your/dev/folder
-    > git clone https://github.com/daveseah/Engine-1401A1.git
-```
-This will create a folder called `Engine-1401A1` containing the project files.
 
-Next, you'll have to install the **project's server-side dependencies** by invoking `npm install` once. The dependencies are already specified for you in the `package.json` file, and will be downloaded automatically:
+(2) Clone the repository from **Github** into a folder where you will keep your development files. I use `~/Dev` on my Mac, but of course you can use anything you want:
 ```
-    > cd Engine-1401A1
-    > cd build
-    > npm install
+  > cd /your/dev/folder
+  > git clone https://github.com/daveseah/Engine-1401A1.git
 ```
-Now you're ready to **build and run** the project! Invoke the **Gulp** task runner's default action by typing:
-```
-    > gulp
-```
-The `gulp` command uses the `gulpfile.js` to execute a runtask. The default runtask invokes **Bower** to download the **client-side dependencies** (as specified in `bower.json` file), copy the files it needs into a `public` directory, and then start an **ExpressJS** server. 
 
-You'll see the URL you need to browse to with a web browser to see the app run. I recommend **Chrome** for this project, though any mainstream HTML5-client desktop browser will probably work.
+This will create a folder called `Engine-1401A1` inside your dev folder that contains the project files.
+
+(3) Install the **project's server-side dependencies**. This will be done by invoking `npm install` once; the dependencies are already specified in the `package.json` file, so this will be pretty painless:
+```
+  > cd Engine-1401A1
+  > cd build
+  > npm install
+```
+
+(4) Now you're ready to **build and run** the project! Type the following: 
+```
+  > gulp
+```
+
+The `gulp` command loads `gulpfile.js` to find and execute a "runtask". The default runtask invokes **Bower** to download the **client-side dependencies** (as specified in `bower.json` file), copy the files it needs into a `public` directory, and then starts an **ExpressJS** web server.
+
+You'll see the URL you need to browse to with a web browser to see the app run. I am using the **Chrome** browser for this project, though any mainstream HTML5-client desktop browser will probably work.
 
