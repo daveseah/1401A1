@@ -5,6 +5,7 @@
 	This server code is based on the Mimosa server.js, but is adapted for use
 	with our new Gulp workflow.
 
+
 \*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ * //////////////////////////////////////*/
 
 	// import libraries
@@ -15,6 +16,7 @@
 	var favicon 		= require('serve-favicon');
 	var cookieParser 	= require('cookie-parser');
 	var errorHandler 	= require('errorhandler');
+	var ip 				= require('ip');
 
 	// allocate 
 	var tinylr;	// set by startLiveReload
@@ -30,10 +32,20 @@
 	var VIEWS_EXT 		= 'hbs';
 	var VIEWS_COMPILER 	= 'handlebars';
 	var COMPILED_DIR 	= __dirname+'/public';
+	var BP 				= '          ';
+	var INFOP 			= '         >';
+	var DIVP 			= '----------';
+	var NP				= '         !';
 
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function startServer ( config ) {
+
+		// close server if it's already running
+		var server_restart = (server) ? true : false;
+		if (server) {
+			server.close();
+		}
 
 		// set defaults
 		config = config || {};
@@ -82,7 +94,10 @@
 
 		// start it up
 		server = app.listen(app.get('port'), function() {
-		  console.log('Express server listening on port %s...',app.get('port'));
+			if (server_restart) return;
+			console.log(DIVP,	'BROWSE TO ONE OF THESE URLS');
+			console.log(BP,	'> LOCAL ... http://localhost:'+app.get('port'));
+			console.log(BP, 	'> LAN ..... http://'+ip.address()+':'+app.get('port'));
 		});
 
 		return server;
@@ -95,7 +110,7 @@
 	function startLiveReload() {
 		tinylr = require('tiny-lr')();
 		tinylr.listen( LIVERELOAD_PORT, function () {
-			console.log('LiveReload listening on port %s...',LIVERELOAD_PORT);
+			console.log(DIVP,'LIVERELOAD ACTIVATED');
 		});
 	} // startLiveReload
 
@@ -109,6 +124,8 @@
 				files: [fileName]
 			}
 		});
+		console.log(BP,'reload:',fileName);
+		startServer();
 	} // notifyLiveReload
 
 

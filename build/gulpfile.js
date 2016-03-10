@@ -9,6 +9,7 @@
 \*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ * //////////////////////////////////////*/
 
 	var gulp 		= require('gulp');
+	var changed 	= require('gulp-changed');
 	var bower 		= require('gulp-bower');
 	var merge		= require('merge-stream');
 	var runseq 		= require('run-sequence');
@@ -66,7 +67,7 @@
 /*/	gulp.task('copy-assets', function () {
 		return merge (
 			// copy assets directory as-is
-			gulp.src([ASSETS+'**']).pipe(gulp.dest(PUB))
+			gulp.src([ASSETS+'**']).pipe(changed(PUB)).pipe(gulp.dest(PUB))
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,11 +96,12 @@
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ start up the server module
 /*/	function runServer() {
-		if (server) {
-			console.log('CLOSING SERVER');
-			server.close();
-		}
 		server = server1401.startServer();
 		server1401.startLiveReload();
-		gulp.watch('*.js', server1401.notifyLiveReload);
+		gulp.watch('assets/javascripts/**', function ( event ) {
+			runseq (
+				['copy-assets'],
+				function () { server1401.notifyLiveReload(event); }
+			);
+		});
 	}
