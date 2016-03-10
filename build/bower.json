@@ -1,0 +1,11 @@
+{
+	"name":	"Engine-1401A1",
+	"version": "1.0.0",
+	"dependencies": {
+		"durandal": "2.1.0",
+		"bootstrap": "3.3.6",
+		"components-font-awesome": "4.5.0"
+	},
+	"devDependencies": {
+	}
+}

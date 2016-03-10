@@ -1,0 +1,13 @@
+# Engine 1401A1 Additional Ignore Rules
+
+# Also ignore build system directories
+.npmignore
+/bower_components
+/public
+/node_modules
+/deploy
+
+# 1401 - Also ignore scratch files
+*-scratch.md
+*-scratch.txt
+
