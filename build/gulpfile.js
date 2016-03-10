@@ -19,7 +19,7 @@
 	var VLIB 		= PUB + 'vendor/';
 	var ASSETS 		= 'assets/';
 
-	var server1401	= require('./server.js');
+	var server1401	= require('./server/1401.js');
 	var server;
 
 

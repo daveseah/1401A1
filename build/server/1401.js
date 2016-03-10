@@ -1,6 +1,7 @@
 /*//////////////////////////////// ABOUT \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*\
 
-	server.js is imported by gulpfile.js as a module
+	1401.js is imported by gulpfile.js as a module, executing in the context
+	of the node.js environment. 
 
 	This server code is based on the Mimosa server.js, but is adapted for use
 	with our new Gulp workflow.
@@ -34,8 +35,9 @@
 	var COMPILED_DIR 	= __dirname+'/public';
 	var BP 				= '          ';
 	var INFOP 			= '         >';
-	var DIVP 			= '----------';
+	var DP 				= '----------';
 	var NP				= '         !';
+	var FP				= '         *';
 
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,9 +97,9 @@
 		// start it up
 		server = app.listen(app.get('port'), function() {
 			if (server_restart) return;
-			console.log(DIVP,	'BROWSE TO ONE OF THESE URLS');
-			console.log(BP,	'> LOCAL ... http://localhost:'+app.get('port'));
-			console.log(BP, 	'> LAN ..... http://'+ip.address()+':'+app.get('port'));
+			console.log(DP,'VISIT ONE OF THESE URLS in CHROME WEB BROWSER',DP);
+			console.log(BP,'LOCAL ... http://localhost:'+app.get('port'));
+			console.log(BP,'LAN ..... http://'+ip.address()+':'+app.get('port'));
 		});
 
 		return server;
@@ -110,7 +112,7 @@
 	function startLiveReload() {
 		tinylr = require('tiny-lr')();
 		tinylr.listen( LIVERELOAD_PORT, function () {
-			console.log(DIVP,'LIVERELOAD ACTIVATED');
+			console.log(DP,'Live reload of assets is enabled',DP);
 		});
 	} // startLiveReload
 
@@ -124,7 +126,7 @@
 				files: [fileName]
 			}
 		});
-		console.log(BP,'reload:',fileName);
+		console.log(FP,'reload:',fileName);
 		startServer();
 	} // notifyLiveReload
 
