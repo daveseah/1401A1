@@ -11,6 +11,7 @@
 	var gulp 		= require('gulp');
 	var bower 		= require('gulp-bower');
 	var merge		= require('merge-stream');
+	var runseq 		= require('run-sequence');
 
 	var BOWER 		= 'bower_components/';
 	var PUB 		= 'public/';
@@ -24,7 +25,9 @@
 ///	GULP TASKS ////////////////////////////////////////////////////////////////
 ///	
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ install bower dependencies in bower.json
+/*/ install bower dependencies in bower.json 
+	NOTE: this is always async in Gulp 3, so need to use run-sequence to wait
+	for all bower installs to complete when including this task as dependency
 /*/	gulp.task('bower', function () {
 		return bower();
 	});
@@ -67,13 +70,22 @@
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ build all assets
+/*/	gulp.task('build', function ( callback ) {
+		runseq ( 
+			'bower',
+			['copy-libs','copy-styles','copy-assets'],
+			callback
+		);
+	});
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ run server
 /*/	gulp.task('server', function () {
 		runServer();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	default
-/*/	gulp.task('default', ['bower','copy-libs', 'copy-styles', 'copy-assets'], function () {
+/*/	gulp.task('default', ['build'], function () {
 		runServer();
 	});
 
