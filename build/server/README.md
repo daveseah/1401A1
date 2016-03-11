@@ -1,0 +1,3 @@
+This folder contains files related to the server operation. The `1401.js` file contains the ExpressJS code that makes loading our app into a browser possible. It's loaded as a NodeJS module in `/build/gulpfile.js` and launched that way.
+
+The `views/` folder holds the web page template that is shown when you visit the webapp page. This is essentially the **starting point** of the web application as far as code execution goes. It is a [Handlebars](http://handlebarsjs.com/) template, which can be rendered into HTML on-the-fly by ExpressJS.
