@@ -84,7 +84,7 @@
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ gather and build all files to public 
 /*/	gulp.task('build', function ( callback ) {
-		return runseq ( 
+		runseq ( 
 			'bower-get',
 			['copy-bower-libs','copy-bower-styles','copy-client-assets'],
 			callback
