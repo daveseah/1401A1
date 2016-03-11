@@ -29,10 +29,10 @@
 
 	var LIVERELOAD_PORT = 35729;
 	var EXPRESS_PORT 	= 3000;
-	var VIEWS_PATH 		= __dirname+'/server/views';
+	var VIEWS_PATH 		= __dirname+'/views';
 	var VIEWS_EXT 		= 'hbs';
 	var VIEWS_COMPILER 	= 'handlebars';
-	var COMPILED_DIR 	= __dirname+'/public';
+	var COMPILED_DIR 	= __dirname+'/../public';
 	var BP 				= '          ';
 	var INFOP 			= '         >';
 	var DP 				= '----------';
