@@ -1,19 +1,12 @@
 ﻿define(function() {
     var ctor = function () {
-        this.displayName = 'Welcome to the Durandal Starter Kit!';
-        this.description = 'Durandal is a cross-device, cross-platform client framework written in JavaScript and designed to make Single Page Applications (SPAs) easy to create and maintain.';
-        this.features = [
-            'Clean MV* Architecture',
-            'JS & HTML Modularity',
-            'Simple App Lifecycle',
-            'Eventing, Modals, Message Boxes, etc.',
-            'Navigation & Screen State Management',
-            'Consistent Async Programming w/ Promises',
-            'App Bundling and Optimization',
-            'Use any Backend Technology',
-            'Built on top of jQuery, Knockout & RequireJS',
-            'Integrates with other libraries such as SammyJS & Bootstrap',
-            'Make jQuery & Bootstrap widgets templatable and bindable (or build your own widgets).'
+        this.displayName = 'About This Project';
+        this.description = '<a href="http://davidseah.com/about/make-video-game/">Project 1401</a> is my "make a game" learning project. The goal is to make a game that incorporates graphics, sound, and physics. It doesn\'t really matter that is is a GREAT game; I\'m hopeful that this project will be helpful to others learning how to build a web app/game in Javascript for modern browsers. Along the way I hope I have some fun and put this old dream to rest.';
+        this.timeline = [
+            '<b>M0</b> - Application Shell!',
+            '<b>M1</b> - Renderer, Pieces, Visuals, GameLoop',
+            '<b>M2</b> - Starfield, Physics, Keyboard Controls',
+            '<b>M3</b> - Port to Engine-1401A1 codebase',
         ];
     };
 

@@ -1,0 +1,6 @@
+gamemeta:
+  config03:
+    object03:
+      subobject03:
+         subsubobject03:
+           string03: 'woot'

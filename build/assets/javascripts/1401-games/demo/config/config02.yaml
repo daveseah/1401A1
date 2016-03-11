@@ -1,0 +1,9 @@
+gamemeta:
+  config02: 'loaded'
+  config02object:
+    string02: 'how'
+    list02: 
+      - 'how'
+      - 'now'
+      - 'brown'
+      - 'cow'

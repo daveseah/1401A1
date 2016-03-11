@@ -1,4 +1,4 @@
-﻿console.log("MAINJS");
+﻿/// REQUIREJS CONFIG //////////////////////////////////////////////////////////
 
 requirejs.config({
     paths: {
@@ -8,17 +8,48 @@ requirejs.config({
         'transitions' : '../../vendor/durandal/js/transitions',
         'knockout': '../../vendor/knockout/knockout',
         'bootstrap': '../../vendor/bootstrap/js/bootstrap.min',
-        'jquery': '../../vendor/jquery/jquery.min'
-    },
+        'jquery': '../../vendor/jquery/jquery.min',
+ // ---- project 1401 paths added --------------------------------------------- //
+        '1401' : '../1401/',
+        '1401-games' : '../1401-games/',
+// ---- project 1401 extra libs ---------------------------------------------- // 
+        'three' : '../../vendor-extra/three.min',
+        'yaml':'../../vendor/yaml.js/yaml',
+        'physicsjs' : '../../vendor/physicsjs/physicsjs-full.min',
+        'keypress' : '../../vendor/Keypress/keypress-2.1.3.min',
+        'howler' : '../../vendor/howler/howler',
+        'webrtc-shim' : '../../vendor/webrtc-adapter/adapter',
+        'socket-io': '../../vendor-extra/socket.io'
+   },
     shim: {
         'bootstrap': {
             deps: ['jquery'],
             exports: 'jQuery'
-       }
+       },
+// ---- project 1401 non-AMD libs -------------------------------------------- // 
+        'three': {
+            exports: 'THREE'
+        },
+        'yaml': {
+            exports: 'YAML'
+        }
     }
 });
 
-define(['durandal/system', 'durandal/app', 'durandal/viewLocator'],  function (system, app, viewLocator) {
+/*//////////////////////////////// ABOUT \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*\
+ 
+\*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ * //////////////////////////////////////*/
+
+define([
+    'durandal/system', 
+    'durandal/app', 
+    'durandal/viewLocator'
+],  function (
+    system, 
+    app, 
+    viewLocator
+) {
+
     //>>excludeStart("build", true);
     system.debug(true);
     //>>excludeEnd("build");

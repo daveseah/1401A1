@@ -40,7 +40,7 @@
 /*/ install bower dependencies in bower.json 
 	NOTE: this is always async in Gulp 3, so need to use run-sequence to wait
 	for all bower installs to complete when including this task as dependency
-/*/	gulp.task('bower-get', function () {
+/*/	gulp.task('bower-install', function () {
 		return bower();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,7 +70,17 @@
 			gulp.src(BOWER+'requirejs/require.js').pipe(gulp.dest(VLIB+'require')),
 			gulp.src(BOWER+'requirejs-text/text.js').pipe(gulp.dest(VLIB+'require')),
 			// copy knockout
-			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VLIB+'knockout'))
+			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VLIB+'knockout')),
+			// copy yaml
+			gulp.src(BOWER+'yaml.js/dist/yaml.*').pipe(gulp.dest(VLIB+'yaml.js')),
+			// copy keypress
+			gulp.src(BOWER+'Keypress/*.js').pipe(gulp.dest(VLIB+'Keypress')),
+			// copy howler
+			gulp.src(BOWER+'howler/*.js').pipe(gulp.dest(VLIB+'howler')),
+			// copy physicsjs
+			gulp.src(BOWER+'physicsjs/dist/*.js').pipe(gulp.dest(VLIB+'physicsjs'))
+			// some libraries are not bower-managed, saved in vendor-extra an
+			// e.g. socket-io, three.min, webrtc-adapter
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -85,7 +95,7 @@
 /*/ gather and build all files to public 
 /*/	gulp.task('build', function ( callback ) {
 		return runseq ( 
-			'bower-get',
+			'bower-install',
 			['copy-bower-libs','copy-bower-styles','copy-client-assets'],
 			callback
 		);

@@ -1,0 +1,13 @@
+# 1401 MASTER SETTINGS FILE
+# syntax: http://en.wikipedia.org/wiki/YAML
+# located at javascripts/1401/settings.yaml
+
+# note: Do not use tabs to indent. Use spaces!
+# note: game-settings.yaml will append/overwrite these definitions
+
+system1401:
+  author: "Dave Seah"
+  description: "Javascript Game Shell"
+  info_trace:
+    rpass: false
+    sprite: false  
