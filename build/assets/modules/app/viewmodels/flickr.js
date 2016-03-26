@@ -21,7 +21,7 @@
         select: function(item) {
             //the app model allows easy display of modal dialogs by passing a view model
             //views are usually located by convention, but you an specify it as well with viewUrl
-            item.viewUrl = 'views/detail';
+            item.viewUrl = 'app/views/detail';
             app.showDialog(item);
         },
         canDeactivate: function () {
