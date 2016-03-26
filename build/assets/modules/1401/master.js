@@ -3,7 +3,7 @@ define ([
 	'1401/objects/sysloop',
 	'1401/system/autosystem',
 	'1401/objects/logic/checkinmonitor',
-	'1401-games/_empty/game-main'
+	'1401-games/demo/game-main'
 ], function (
 	SETTINGS,
 	SYSLOOP,
@@ -14,9 +14,9 @@ define ([
 
 	var DBGOUT = true;
 
-	// Set this to TRUE if not setting a DEFAULT_GAME
-	// Dynamic loading breaks code optimization if you are trying to use it
+	// note: dynamic loading breaks r.js code optimization if you are using it
 	var USE_DYNAMIC_LOADING = true;
+	// the DEFAULT_GAME used in static loading is defined above
 
 ///////////////////////////////////////////////////////////////////////////////
 /**	GAME MASTER *************************************************************\
@@ -107,7 +107,7 @@ define ([
 			if (module_path.length>32) 
 				str = module_path.substr(module_path.length-32);
 			console.log ("DYNAMIC LOAD ..."+str);
-			console.log(module_path);
+			// module loaded in module_path is passed to m_GameInstantiated
 			require ( [module_path], m_GameInstantiated );
 		} else {
 			console.log("!!! STATIC LOAD", DEFAULT_GAME.name.bracket());
@@ -121,11 +121,11 @@ define ([
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*/	Called after m_GameLoad's require has loaded the module.
 	Load game settings file first...
-/*/	function m_GameInstantiated ( loadedGame ) {
+/*/	function m_GameInstantiated ( loadedModule ) {
 		console.groupEnd();
 		console.group('Game Startup');
 
-		m_game = loadedGame;
+		m_game = loadedModule;
 		var gameSettings = SETTINGS.GameSettingsURI();
 		SETTINGS.Load(gameSettings, _master, m_GameInitialize);
 
