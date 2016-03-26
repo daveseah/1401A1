@@ -1,14 +1,13 @@
-﻿console.log("MAINJS");
-
-requirejs.config({
+﻿requirejs.config({
+    baseUrl: '/modules',
     paths: {
-        'text': '../../vendor/require/text',
-        'durandal':'../../vendor/durandal/js',
-        'plugins' : '../../vendor/durandal/js/plugins',
-        'transitions' : '../../vendor/durandal/js/transitions',
-        'knockout': '../../vendor/knockout/knockout',
-        'bootstrap': '../../vendor/bootstrap/js/bootstrap.min',
-        'jquery': '../../vendor/jquery/jquery.min'
+        'text': 'vendor/require/text',
+        'durandal':'vendor/durandal/js',
+        'plugins' : 'vendor/durandal/js/plugins',
+        'transitions' : 'vendor/durandal/js/transitions',
+        'knockout': 'vendor/knockout/knockout',
+        'bootstrap': 'vendor/bootstrap/js/bootstrap.min',
+        'jquery': 'vendor/jquery/jquery.min'
     },
     shim: {
         'bootstrap': {
@@ -17,7 +16,6 @@ requirejs.config({
        }
     }
 });
-
 define(['durandal/system', 'durandal/app', 'durandal/viewLocator'],  function (system, app, viewLocator) {
     //>>excludeStart("build", true);
     system.debug(true);
@@ -36,6 +34,6 @@ define(['durandal/system', 'durandal/app', 'durandal/viewLocator'],  function (s
         viewLocator.useConvention();
 
         //Show the app by setting the root view model for our application with a transition.
-        app.setRoot('viewmodels/shell', 'entrance');
+        app.setRoot('app/viewmodels/shell', 'entrance');
     });
 });

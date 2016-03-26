@@ -11,14 +11,16 @@
 	var gulp 		= require('gulp');
 	var bower 		= require('gulp-bower');
 	var changed 	= require('gulp-changed');
+	var concat 		= require('gulp-concat');
 	var del 		= require('del');
 	var merge		= require('merge-stream');
 	var runseq 		= require('run-sequence');
 
 	var BOWER 		= 'bower_components/';
-	var PUB 		= 'public/';
-	var VLIB 		= PUB + 'vendor/';
-	var CLIENT 		= 'assets/';
+	var PUBLIC 		= 'public/';
+	var VENDOR 		= PUBLIC + 'modules/vendor/';
+	var MODULES 	= PUBLIC + 'modules/';
+	var ASSETS 		= 'assets/';
 
 	var server1401	= require('./server/1401.js');
 	var server;
@@ -27,76 +29,116 @@
 ///	GULP TASKS ////////////////////////////////////////////////////////////////
 ///	
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	clean out bower components and public directory
+/*/	Clean-out bower components and public directory
 /*/	gulp.task('clean:all', function () {
-		return del([BOWER,PUB]);
+		return del([BOWER,PUBLIC]);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	clean out public directory
 /*/	gulp.task('clean', function () {
-		return del(PUB);
+		return del(PUBLIC);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ install bower dependencies in bower.json 
+/*/ Install bower dependencies in bower.json 
 	NOTE: this is always async in Gulp 3, so need to use run-sequence to wait
 	for all bower installs to complete when including this task as dependency
 /*/	gulp.task('bower-get', function () {
 		return bower();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ copy bower library styles
-/*/	gulp.task('copy-bower-styles', function () {
-		return merge (
-			gulp.src(BOWER+'bootstrap/dist/css/*').pipe(gulp.dest(VLIB+'bootstrap/css')),
-			gulp.src(BOWER+'bootstrap/dist/fonts/*').pipe(gulp.dest(VLIB+'bootstrap/fonts')),
-			gulp.src(BOWER+'bootstrap/dist/fonts/*').pipe(gulp.dest(VLIB+'bootstrap/fonts')),
-			gulp.src(BOWER+'components-font-awesome/css/*').pipe(gulp.dest(VLIB+'font-awesome/css')),
-			gulp.src(BOWER+'components-font-awesome/fonts/*').pipe(gulp.dest(VLIB+'font-awesome/fonts'))
-		);
-	});
-/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ copy bower library javascripts
-/*/	gulp.task('copy-bower-libs', function () {
+/*/ Copy framework-related modules and assets in bower_components.
+	As far as I can tell, this is the "best practice" approach to copy
+	from bower_components
+/*/	gulp.task('copy-bower-assets', function () {
 		return merge (
 			// copy jquery
-			gulp.src(BOWER+'jquery/jquery.min*').pipe(gulp.dest(VLIB+'jquery')),
+			gulp.src(BOWER+'jquery/jquery.min*').pipe(gulp.dest(VENDOR+'jquery')),
 			// copy bootstrap
-			gulp.src(BOWER+'bootstrap/dist/js/bootstrap*').pipe(gulp.dest(VLIB+'bootstrap/js')),
+			gulp.src(BOWER+'bootstrap/dist/js/bootstrap*').pipe(gulp.dest(VENDOR+'bootstrap/js')),
+			gulp.src(BOWER+'bootstrap/dist/css/*').pipe(gulp.dest(VENDOR+'bootstrap/css')),
+			gulp.src(BOWER+'bootstrap/dist/fonts/*').pipe(gulp.dest(VENDOR+'bootstrap/fonts')),
+			gulp.src(BOWER+'bootstrap/dist/fonts/*').pipe(gulp.dest(VENDOR+'bootstrap/fonts')),
+			// copy font awesome
+			gulp.src(BOWER+'components-font-awesome/css/*').pipe(gulp.dest(VENDOR+'font-awesome/css')),
+			gulp.src(BOWER+'components-font-awesome/fonts/*').pipe(gulp.dest(VENDOR+'font-awesome/fonts')),
 			// copy durandal
-			gulp.src(BOWER+'durandal/js/**').pipe(gulp.dest(VLIB+'durandal/js')),
-			gulp.src(BOWER+'durandal/img/**').pipe(gulp.dest(VLIB+'durandal/img')),
-			gulp.src(BOWER+'durandal/css/**').pipe(gulp.dest(VLIB+'durandal/css')),
+			gulp.src(BOWER+'durandal/js/**').pipe(gulp.dest(VENDOR+'durandal/js')),
+			gulp.src(BOWER+'durandal/img/**').pipe(gulp.dest(VENDOR+'durandal/img')),
+			gulp.src(BOWER+'durandal/css/**').pipe(gulp.dest(VENDOR+'durandal/css')),
 			// copy require
-			gulp.src(BOWER+'requirejs/require.js').pipe(gulp.dest(VLIB+'require')),
-			gulp.src(BOWER+'requirejs-text/text.js').pipe(gulp.dest(VLIB+'require')),
+			gulp.src(BOWER+'requirejs/require.js').pipe(gulp.dest(VENDOR+'require')),
+			gulp.src(BOWER+'requirejs-text/text.js').pipe(gulp.dest(VENDOR+'require')),
 			// copy knockout
-			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VLIB+'knockout'))
+			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VENDOR+'knockout'))
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	copy browser-side assets
-/*/	gulp.task('copy-client-assets', function () {
+/*/ Copy extra framework modules and assets from bower_components. 
+	Use copy-frame-assets as an example
+/*/	gulp.task('copy-more-bower-assets', function () {
+		// add additional bower_component libraries
+	});
+
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Copy non-framework modules and assets, ignoring Markdown files.
+/*/	gulp.task('copy-assets', function () {
 		return merge (
-			// copy assets directory as-is
-			gulp.src([CLIENT+'**']).pipe(changed(PUB)).pipe(gulp.dest(PUB))
+			// copy modules directory, skipping framework
+			gulp.src([
+					ASSETS+'modules/**',
+				 	'!'+ASSETS+'modules/**/*.md'
+				])
+			    .pipe(changed(PUBLIC))
+			    .pipe(gulp.dest(PUBLIC+'modules')),
+			// copy images directory as-is
+			gulp.src([
+					ASSETS+'images/**',
+				 	'!'+ASSETS+'images/**/*.md'
+				])
+			    .pipe(changed(PUBLIC))
+			    .pipe(gulp.dest(PUBLIC+'images')),
+			// copy stylesheets as-is
+			gulp.src([
+				 	ASSETS+'styles/**',
+				 	'!'+ASSETS+'styles/**/*.md'
+				])
+			    .pipe(changed(PUBLIC))
+			    .pipe(gulp.dest(PUBLIC+'styles'))
+		);
+	});
+
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Example of concatenation (not used)
+/*/	gulp.task('example-concat', function () {
+		return merge ( 
+		    // note: add additional gulp pipes at top, not bottom //
+			gulp.src([
+					ASSETS+'modules/vendor_extra/*.css'
+				])
+		    	.pipe(concat('vendor_extra.css'))
+		    	.pipe(gulp.dest(PUBLIC+'styles'))
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ gather and build all files to public 
+/*/ Gather and build all files to public 
 /*/	gulp.task('build', function ( callback ) {
 		runseq ( 
 			'bower-get',
-			['copy-bower-libs','copy-bower-styles','copy-client-assets'],
+			[
+				'copy-bower-assets',
+				'copy-more-bower-assets',
+				'copy-assets'
+			],
 			callback
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ run server
+/*/ Run server
 /*/	gulp.task('server', function () {
 		runServer();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	default
+/*/	Default
 /*/	gulp.task('default', ['build'], function () {
 		runServer();
 	});
@@ -105,13 +147,15 @@
 ///	UTILITY FUNCTIONS /////////////////////////////////////////////////////////
 ///	
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ start up the server module
+/*/ Start up the server module
 /*/	function runServer() {
+		console.log("Running Server");
 		server = server1401.startServer();
 		server1401.startLiveReload();
-		gulp.watch(CLIENT+'javascripts/**', function ( event ) {
+		// if changing watch path, make sure to change copy paths in tasks
+		gulp.watch(ASSETS+'modules/**', function ( event ) {
 			runseq (
-				['copy-client-assets'],
+				['copy-assets'],
 				function () { server1401.notifyLiveReload(event); }
 			);
 		});
