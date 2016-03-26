@@ -1,4 +1,4 @@
-﻿define(['plugins/router', 'durandal/app'], function (router, app) {
+define(['plugins/router', 'durandal/app'], function (router, app) {
     return {
         router: router,
         search: function() {
@@ -8,8 +8,9 @@
         },
         activate: function () {
             router.map([
-                { route: '', title:'Welcome', moduleId: 'viewmodels/welcome', nav: true },
-                { route: 'demo', title:'Demo', moduleId: 'viewmodels/demo', nav: true }
+                { route: '', title:'Welcome', moduleId: 'app/viewmodels/welcome', nav: true },
+                { route: 'flickr', moduleId: 'app/viewmodels/flickr', nav: false },
+                { route: 'demo', title:'Demo', moduleId: '1401-games/demo/app', nav: true }
             ]).buildNavigationModel();
             
             return router.activate();

@@ -14,10 +14,10 @@
 	<link rel="apple-touch-startup-image" href="vendor/durandal/img/ios-startup-image-portrait.png" media="(orientation:portrait)" />
 	<link rel="apple-touch-icon" href="vendor/durandal/img/icon.png"/>
 
-	<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.css" />
-	<link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.css" />
-	<link rel="stylesheet" href="vendor/durandal/css/durandal.css" />
-	<link rel="stylesheet" href="styles/starterkit.css" />
+	<link rel="stylesheet" href="modules/vendor/bootstrap/css/bootstrap.css" />
+	<link rel="stylesheet" href="modules/vendor/font-awesome/css/font-awesome.css" />
+	<link rel="stylesheet" href="modules/vendor/durandal/css/durandal.css" />
+	<link rel="stylesheet" href="styles/durandal-starterkit.css" />
 
 	<script type="text/javascript">
 		if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
@@ -43,11 +43,11 @@
 	{{/reload}}
 
     {{#optimize}}
-     <script src="javascripts/app/main-built.js"></script>
+     <script src="modules/app/main-built.js"></script>
     {{/optimize}}
 
     {{^optimize}}
-	<script src="vendor/require/require.js" data-main="javascripts/app/main.js"></script>
+	<script src="modules/vendor/require/require.js" data-main="modules/app/main.js"></script>
     {{/optimize}}
 
   </body>

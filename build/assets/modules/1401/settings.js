@@ -37,9 +37,9 @@ define ([
 	// set constant paths
 	var PATH_1401 		= '/1401/';
 	var PATH_1401_GAMES	= '/1401-games/';
-	var URI_1401 		= '/javascripts'+PATH_1401;
+	var URI_1401 		= '/modules'+PATH_1401;
 	// this gets GameID() added during InitializePaths()
-	var URI_GAME_DIR 	= '/javascripts'+PATH_1401_GAMES;
+	var URI_GAME_DIR 	= '/modules'+PATH_1401_GAMES;
 	var FILE_SYS_SET 	= 'settings.yaml';
 	var MOD_GAME_RUN 	= 'game-main';	
 	var FILE_GAME_SET 	= 'game-settings.yaml';

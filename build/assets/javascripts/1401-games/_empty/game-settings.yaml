@@ -1,9 +1,0 @@
-# LOCAL SETTINGS FOR <NEW PROJECT>
-# syntax: http://en.wikipedia.org/wiki/YAML
-# overwrites javascripts/app/inqsim-settings.yaml
-
-# Do not use tabs to indent. Use spaces!
-# If you change these values, make sure to clear localStorage or they might not show (ls_reset())
-
-anobject:
-  prop1: "I am a String"
