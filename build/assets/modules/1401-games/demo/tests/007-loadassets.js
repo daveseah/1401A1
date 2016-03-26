@@ -44,9 +44,9 @@ define ([
 
 		// create list of yaml to load
 		var yamls = [];
-		yamls.push(SETTINGS.GamePath('config/config01.yaml'));
-		yamls.push(SETTINGS.GamePath('config/config02.yaml'));
-		yamls.push(SETTINGS.GamePath('config/config03.yaml'));
+		yamls.push(SETTINGS.GamePath('../demo/config/config01.yaml'));
+		yamls.push(SETTINGS.GamePath('../demo/config/config02.yaml'));
+		yamls.push(SETTINGS.GamePath('../demo/config/config03.yaml'));
 
 		// create a new CheckInMonitor to handle our subyaml loads
 		var mycim = new CheckInMonitor( that, f_LoadComplete );

@@ -102,7 +102,7 @@ define ([
 	                { name: 'flicker', framecount: 2, fps:4 }
 	            ]
 	        };
-	        shipSprite.DefineSequences(SETTINGS.AssetPath('resources/crixa.png'),seq);
+	        shipSprite.DefineSequences(SETTINGS.AssetPath('../demo/resources/crixa.png'),seq);
 	       	// shipSprite.PlaySequence("flicker");
 	        crixa = PIECEFACTORY.NewMovingPiece("crixa");
 	        crixa.SetVisual(shipSprite);
@@ -127,7 +127,7 @@ define ([
 	        // make sprites
 			for (i=0;i<3;i++) {
 				platform = VISUALFACTORY.MakeStaticSprite(
-					SETTINGS.AssetPath('resources/teleport.png'),
+					SETTINGS.AssetPath('../demo/resources/teleport.png'),
 					do_nothing
 				);
 				platform.SetZoom(1.0);
@@ -137,7 +137,7 @@ define ([
 
 			for (i=0;i<3;i++) {
 				platform = VISUALFACTORY.MakeStaticSprite(
-					SETTINGS.AssetPath('resources/teleport.png'),
+					SETTINGS.AssetPath('../demo/resources/teleport.png'),
 					do_nothing
 				);
 				platform.position.set(0,-125,100-(i*50));
@@ -148,7 +148,7 @@ define ([
 			function do_nothing () {}
 
 			// load sound
-			var sfx = SETTINGS.AssetPath('resources/pewpew.ogg');
+			var sfx = SETTINGS.AssetPath('../demo/resources/pewpew.ogg');
 			snd_pewpew = new Howl({
 				urls: [sfx]
 			});
