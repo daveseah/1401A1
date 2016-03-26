@@ -206,7 +206,7 @@ define ([
 		gameId = gameId || this.GameID();
 		if (URI_GAME_DIR===undefined) 
 			console.error("GameMainModule is invalid before MasterGameLoad");
-		return URI_GAME_DIR + '/' + MOD_GAME_RUN+'.js';
+		return URI_GAME_DIR + MOD_GAME_RUN+'.js';
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Return TRUE if str begins with http:// or https://

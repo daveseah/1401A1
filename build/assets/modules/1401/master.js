@@ -2,21 +2,16 @@ define ([
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/autosystem',
-	'1401/objects/logic/checkinmonitor',
-	'1401-games/demo/game-main'
+	'1401/objects/logic/checkinmonitor'
 ], function (
 	SETTINGS,
 	SYSLOOP,
 	AUTOSYS,
-	CheckInMonitor,
-	DEFAULT_GAME
+	CheckInMonitor
 ) {
 
 	var DBGOUT = true;
 
-	// note: dynamic loading breaks r.js code optimization if you are using it
-	var USE_DYNAMIC_LOADING = true;
-	// the DEFAULT_GAME used in static loading is defined above
 
 ///////////////////////////////////////////////////////////////////////////////
 /**	GAME MASTER *************************************************************\
@@ -101,21 +96,14 @@ define ([
 		m_game = null;
 
 		/* load game module asynchronously */
-		if (USE_DYNAMIC_LOADING) {
-			// this breaks with mimosa build -omp
-			var str = module_path;
-			if (module_path.length>32) 
-				str = module_path.substr(module_path.length-32);
-			console.log ("DYNAMIC LOAD ..."+str);
-			// module loaded in module_path is passed to m_GameInstantiated
-			require ( [module_path], m_GameInstantiated );
-		} else {
-			console.log("!!! STATIC LOAD", DEFAULT_GAME.name.bracket());
-			m_GameInstantiated ( DEFAULT_GAME );
-		}
+		// this breaks with mimosa build -omp
+		var str = module_path;
+		if (module_path.length>32) 
+			str = module_path.substr(module_path.length-32);
+		console.log ("DYNAMIC LOAD ..."+str);
+		// module loaded in module_path is passed to m_GameInstantiated
+		require ( [module_path], m_GameInstantiated );
 		// ...execution continues in m_GameInstantiate()
-
-		
 	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -128,7 +116,6 @@ define ([
 		m_game = loadedModule;
 		var gameSettings = SETTINGS.GameSettingsURI();
 		SETTINGS.Load(gameSettings, _master, m_GameInitialize);
-
 		// ...execution continues in m_GameInitialize()
 	}
 
@@ -170,7 +157,6 @@ define ([
 		SETTINGS._SetMasterFrame(m_current_frame_num);
 
 		SYSLOOP.StartAll ( m_current_time_ms );
-
 
 		// game will get called on every Step() from here on out
 		m_timer_id = setInterval( m_TimeStep, m_interval_ms );
@@ -215,13 +201,11 @@ define ([
 			console.error(e.stack);
 			throw new Error(e);
 		}
-
 	}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 /** RETURN MODULE DEFINITION FOR REQUIREJS ***********************************/
-
 	return MASTER;
 
 });
