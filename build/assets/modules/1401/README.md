@@ -20,7 +20,12 @@ This system is a work-in-progress, so the architecture and features are subject 
 
 #### ADDING TO DURANDAL
 
-A DurandalApp can launch the **1401 Game System** from its viewmodel during the `compositionComplete` event. This event fires after Durandal has finishing rendering its views and subviews.
+For purposes of this document, let's say you're adding a new game tab for 'Pickles'. Follow these instructions:
 
-MASTER is the 1401 Game System launcher, and exposes a single method called `Start()` that accepts a `gameID` that matches a subfolder in the `1401-games` directory. The `game-main.js` file is dynamically loaded through RequireJS.
+* in `1401-games`, create a folder called `pickles`.
+* in `1401-games/pickles`, copy the files in `1401-games/demo/game-*`
+* in `app/shell.js`, edit the route definition to add 
+To add a new game tab, create a folder in `1401-games` with the name of your new game.  it to app/shell.js's route definition DurandalApp can launch the **1401 Game System**
+
+MASTER is the 1401 Game System launcher, and exposes a single method called `Start()` that accepts a `gameID` that matches a subfolder in the `1401-games` directory. The `game-start.js` file is dynamically loaded through RequireJS.
 

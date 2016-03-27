@@ -1,0 +1,10 @@
+# LOCAL SETTINGS FOR TESTS
+# syntax: http://en.wikipedia.org/wiki/YAML
+# overwrites javascripts/app/inqsim-settings.yaml
+
+# Do not use tabs to indent. Use spaces!
+# If you change these values, make sure to clear localStorage or they might not show (ls_reset())
+
+gamemeta:
+  title: "Test Suite"
+  description: "Test Runfiles"

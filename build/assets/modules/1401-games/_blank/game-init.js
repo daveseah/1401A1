@@ -27,8 +27,8 @@ define ([
 
 	var MOD = {};
 
-	MOD.displayName = 'Game Demo';
-	MOD.description = 'Game system testing code';
+	MOD.displayName = 'Blank Template';
+	MOD.description = 'Put Your Description in game-init.js';
 
 	MOD.compositionComplete = function () {
 		MASTER.Start( this );

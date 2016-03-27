@@ -23,8 +23,7 @@
 	var ASSETS      = 'assets/';
 
 	var server1401  = require('./server/1401.js');
-	var server;
-
+	var serverInstance;
 
 ///	GULP TASKS ////////////////////////////////////////////////////////////////
 ///	
@@ -159,7 +158,7 @@
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Start up the server module
 /*/	function runServer() {
-		server = server1401.startServer();
+		serverInstance = server1401.startServer();
 		server1401.startLiveReload();
 		// if changing watch path, make sure to change copy paths in tasks
 		gulp.watch(ASSETS+'modules/**', function ( event ) {

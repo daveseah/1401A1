@@ -1,9 +1,11 @@
 define ([
+	'plugins/router',
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/autosystem',
 	'1401/objects/logic/checkinmonitor'
 ], function (
+	router,
 	SETTINGS,
 	SYSLOOP,
 	AUTOSYS,
@@ -12,15 +14,20 @@ define ([
 
 	var DBGOUT = true;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 /**	GAME MASTER *************************************************************\
 
 	Initializes and launches the game system.
-	Also maintains the time step.
+	Controls the master timestep.
 
-	The system loads "games" that are located in the 1401-games directory,
-	and loads the 'game-start' module to start.
+	The system loads "games" that are located in the 1401-games directory.
+	The path to the 'game-run' module is inferred from the Durandal route,
+	and it is dynamically loaded and run.
+
+	MASTER is responsible for initializing all the support services that
+	a game module can access. Game modules are objects with an interface
+	called SYSLOOP which defines high-level game events such as Initialize,
+	LoadAssets, Start, and Step. 
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,21 +53,23 @@ define ([
 			console.log(msg);
 		}
 
+		// save the viewmodel
 		if (!viewModel) {
 			console.error("Master.Start: A Durandal viewmodel must be provided");
 			return;
 		}
 		m_viewmodel = viewModel;
 
-		if (!viewModel.gameId) {
-			console.error('Master.Start: ViewModel is missing gameId parameter.');
+		// get active route from Durandal router module
+		var gameId = router.activeInstruction().fragment;
+		if (!gameId) {
+			console.error('Master.Start: could not get router path to game-run.js');
 			return;
 		}
-
-		// load master settings asynchronously then load game module
+		// load master settings asynchronously, then load game module
 		SETTINGS.Load (SETTINGS.SettingsURI(), _master, function () {
 			// select game to load
-			m_GameLoad ( viewModel.gameId, viewModel );
+			m_GameLoad ( gameId, viewModel );
 		});
 
 		// ...execution continues in m_GameLoad()
@@ -178,7 +187,7 @@ define ([
 			// step the game
 			if (m_game.IsRunning()) {
 				AUTOSYS.HeartBeat( m_interval_ms );
-				// there is only one master step, defined in game-start.js
+				// there is only one master step, defined in game-run.js
 				SYSLOOP.GameStep( m_interval_ms );
 				// note that GameStep is responsible for calling
 				// GetInput, Update, Think, etc in the correct order
