@@ -10,7 +10,7 @@ define(['plugins/router', 'durandal/app'], function (router, app) {
             router.map([
                 { route: '', title:'Welcome', moduleId: 'app/viewmodels/welcome', nav: true },
                 { route: 'flickr', moduleId: 'app/viewmodels/flickr', nav: false },
-                { route: 'demo', title:'Demo', moduleId: '1401-games/demo/app', nav: true }
+                { route: 'demo', title:'Demo', moduleId: '1401-games/demo/game-init', nav: true }
             ]).buildNavigationModel();
             
             return router.activate();

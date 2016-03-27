@@ -19,8 +19,8 @@ define ([
 	Initializes and launches the game system.
 	Also maintains the time step.
 
-	The system loads "games" that are located in the 1401-apps directory,
-	and loads the 'game-main' module to start.
+	The system loads "games" that are located in the 1401-games directory,
+	and loads the 'game-start' module to start.
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ define ([
 			// step the game
 			if (m_game.IsRunning()) {
 				AUTOSYS.HeartBeat( m_interval_ms );
-				// there is only one master step, defined in game-main.js
+				// there is only one master step, defined in game-start.js
 				SYSLOOP.GameStep( m_interval_ms );
 				// note that GameStep is responsible for calling
 				// GetInput, Update, Think, etc in the correct order
