@@ -5,14 +5,14 @@ define ([
 	'1401/objects/sysloop',
 	'1401/system/renderer',
 /*** UNCOMMENT ONE TEST *****************************************************/
-//	'1401-games/demo/tests/001-gameloop'
-//	'1401-games/demo/tests/002-stars-finite'
-//	'1401-games/demo/tests/003-stars-infinite'
-	'1401-games/demo/tests/004-ship-movement'
-//	'1401-games/demo/tests/005-btree-base'
-//	'1401-games/demo/tests/006-btree-factory'
-//	'1401-games/demo/tests/007-loadassets'
-//	'1401-games/demo/tests/008-timer'
+//	SYS1401.LocalPath('tests/001-gameloop')
+//	SYS1401.LocalPath('tests/002-stars-finite')
+//	SYS1401.LocalPath('tests/003-stars-infinite')
+ 	SYS1401.LocalPath('tests/004-ship-movement')
+//	SYS1401.LocalPath('tests/005-btree-base')
+//	SYS1401.LocalPath('tests/006-btree-factory')
+//	SYS1401.LocalPath('tests/007-loadassets')
+//	SYS1401.LocalPath('tests/008-timer')
 ], function ( 
 	DBG,
 	SETTINGS,

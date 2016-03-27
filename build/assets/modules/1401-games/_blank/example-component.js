@@ -1,4 +1,4 @@
-/* _blank/player.js */
+/* _blank/example-component.js */
 define ([
 	'1401/objects/sysloop',
 	'1401/settings',
@@ -21,6 +21,7 @@ define ([
 	Creating a module that is a SYSLOOP will automatically connect it to 
 	the 1401 system loop. You can write code that works like a stand-alone
 	component.
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /** MODULE DECLARATION *******************************************************/

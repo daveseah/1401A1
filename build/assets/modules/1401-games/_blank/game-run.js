@@ -3,7 +3,7 @@ define ([
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/renderer',
-	'1401-games/_blank/example-component'
+	SYS1401.LocalPath('example-component')
 ], function ( 
 	SETTINGS,
 	SYSLOOP,

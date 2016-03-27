@@ -1,11 +1,13 @@
 define ([
 	'plugins/router',
+	'1401/system/debug',
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/autosystem',
 	'1401/objects/logic/checkinmonitor'
 ], function (
 	router,
+	DEBUG,
 	SETTINGS,
 	SYSLOOP,
 	AUTOSYS,
@@ -66,6 +68,16 @@ define ([
 			console.error('Master.Start: could not get router path to game-run.js');
 			return;
 		}
+
+		// save magic global path for less hardcoding in components
+		window.SYS1401 = {
+			LocalPath: function (moduleId) {
+				if (!moduleId) throw "SYS1401.LocalRequire() expects a moduleId";
+				if (!moduleId.endsWith('.js')) moduleId += '.js';
+				return '/'+SETTINGS.GamePath(moduleId);
+			}
+		};
+
 		// load master settings asynchronously, then load game module
 		SETTINGS.Load (SETTINGS.SettingsURI(), _master, function () {
 			// select game to load
