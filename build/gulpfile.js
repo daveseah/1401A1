@@ -93,26 +93,24 @@
 
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Copy non-framework modules and assets, ignoring Markdown files.
+    This includes vendor-extra, which contains non-bower managed libs.
 /*/	gulp.task('copy-assets', function () {
 		return merge (
 			// copy modules directory, skipping framework
 			gulp.src([
-					ASSETS+'modules/**',
-				 	'!'+ASSETS+'modules/**/*.md'
+					ASSETS+'modules/**/!(*.md)'
 				])
 			    .pipe(changed(PUBLIC))
 			    .pipe(gulp.dest(PUBLIC+'modules')),
 			// copy images directory as-is
 			gulp.src([
-					ASSETS+'images/**',
-				 	'!'+ASSETS+'images/**/*.md'
+					ASSETS+'images/**/!(*.md)'
 				])
 			    .pipe(changed(PUBLIC))
 			    .pipe(gulp.dest(PUBLIC+'images')),
 			// copy stylesheets as-is
 			gulp.src([
-				 	ASSETS+'styles/**',
-				 	'!'+ASSETS+'styles/**/*.md'
+					ASSETS+'styles/**/!(*.md)'
 				])
 			    .pipe(changed(PUBLIC))
 			    .pipe(gulp.dest(PUBLIC+'styles'))
