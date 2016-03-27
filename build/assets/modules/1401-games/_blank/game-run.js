@@ -1,30 +1,20 @@
-/* demo/game-main.js */
+/* _blank/game-run.js */
 define ([
-	'1401/system/debug',
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/renderer',
-/*** UNCOMMENT ONE TEST *****************************************************/
-//	'1401-games/demo/tests/001-gameloop'
-//	'1401-games/demo/tests/002-stars-finite'
-//	'1401-games/demo/tests/003-stars-infinite'
-	'1401-games/demo/tests/004-ship-movement'
-//	'1401-games/demo/tests/005-btree-base'
-//	'1401-games/demo/tests/006-btree-factory'
-//	'1401-games/demo/tests/007-loadassets'
-//	'1401-games/demo/tests/008-timer'
+	SYS1401.LocalPath('example-component')
 ], function ( 
-	DBG,
 	SETTINGS,
 	SYSLOOP,
 	RENDERER,
-	TEST
+	COMPONENT
 ) {
 
 ///////////////////////////////////////////////////////////////////////////////
-/**	DEMO GAME ***************************************************************\
+/**	BLANK TEMPLATE ***********************************************************\
 
-	This file, game-main.js, is the starting point of the game. It uses the 
+	This file, game-run.js, is the starting point of the game. It uses the 
 	API for Game Loops (SYSLOOP) to run under the control of master.js.
 
 	In general, you'll be hooking into these functions as necessary.
@@ -42,7 +32,7 @@ define ([
 	allowing you to write independent-yet-synchronized modules without
 	having to add the glue code yourself.
 
-	Note that the critical GameStep is ONLY implemented by game-main.js.
+	Note that the critical GameStep is ONLY implemented by game-run.js.
 	It uses a different set of SYSLOOP handlers that need to be explicitly
 	enabled. See sysloop.js for documentation.
 
@@ -51,7 +41,7 @@ define ([
 /** PUBLIC API **************************************************************/
 
 	// create a game loop handler object with all necessary functions
-	var MAIN = SYSLOOP.InitializeGame('Game-Main');
+	var MAIN = SYSLOOP.InitializeGame('Game-Run');
 
 	// add handlers as needed
 	MAIN.SetHandler( 'Connect', API_HandleConnect );
@@ -73,8 +63,12 @@ define ([
 	layer of code (knockout variables, for example)
 /*/	function API_HandleConnect ( viewModel ) {
 
-		m_viewmodel = viewModel;
 		console.log("MAIN: Initializing!");
+
+		// save the viewmodel if we want it later
+		m_viewmodel = viewModel;
+
+		// initialize the renderer
 		var parm = {
 			attachTo: '#container',		// WebGL attaches to this
 			renderWidth: 768,			// width of render context
@@ -114,8 +108,6 @@ define ([
 		/* game level management */
 
 	}
-
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 ///////////////////////////////////////////////////////////////////////////////
