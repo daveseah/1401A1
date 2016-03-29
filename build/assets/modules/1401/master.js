@@ -1,3 +1,15 @@
+// add extra game-related paths
+SYS1401.AddModulePath( '1401', '1401' );
+SYS1401.AddModulePath( '1401-games', '1401-games');
+SYS1401.AddModulePath( 'yaml', 'vendor/yaml.js/yaml','YAML' );
+SYS1401.AddModulePath( 'three', 'vendor-extra/three.min','THREE' );
+SYS1401.AddModulePath( 'physicsjs', 'vendor/physicsjs/physicsjs-full.min' );
+SYS1401.AddModulePath( 'keypress', 'vendor/Keypress/keypress-2.1.3.min' );
+SYS1401.AddModulePath( 'howler', 'vendor/howler/howler' );
+SYS1401.AddModulePath( 'webrtc-shim', 'vendor/webrtc-adapter/adapter' );
+SYS1401.AddModulePath( 'socket-io', 'vendor-extra/socket.io' );
+
+SYS1401.UpdateModulePaths();
 define ([
 	'plugins/router',
 	'1401/system/debug',

@@ -1,4 +1,3 @@
-/* demo/game-main.js */
 define ([
 	'1401/system/debug',
 	'1401/settings',
