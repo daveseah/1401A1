@@ -13,11 +13,12 @@ define ([
 //	SYS1401.LocalPath('tests/001-gameloop')
 //	SYS1401.LocalPath('tests/002-stars-finite')
 //	SYS1401.LocalPath('tests/003-stars-infinite')
- 	SYS1401.LocalPath('tests/004-ship-movement')
+// 	SYS1401.LocalPath('tests/004-ship-movement')
 //	SYS1401.LocalPath('tests/005-btree-base')
 //	SYS1401.LocalPath('tests/006-btree-factory')
 //	SYS1401.LocalPath('tests/007-loadassets')
 //	SYS1401.LocalPath('tests/008-timer')
+	SYS1401.LocalPath('tests/009-ship-bullets')
 ], function ( 
 	DBG,
 	SETTINGS,
