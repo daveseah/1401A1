@@ -40,7 +40,7 @@ if (window.SYS1401) {
     };
     // AddModulePath() is used by 1401-game modules that need to add additional
     // paths to the RequireJS config. Call UpdateModulePaths() afterwards.
-    SYS1401.AddModulePath = function ( module, path, deps, exports ) {
+    SYS1401.AddModulePath = function ( module, path, exports, deps ) {
         if (typeof module!=='string') {
             console.error('SYS1401.AddModulePath requires string modulename to define');
             return;
@@ -50,13 +50,13 @@ if (window.SYS1401) {
             return;
         }
         SYS1401.RCFG.paths[module] = path;
-        if (deps) {
-            SYS1401.RCFG.shim[module] = SYS1401.RCFG.shim[module] || {};
-            SYS1401.RCFG.shim[module].deps = deps;
-        }
         if (typeof exports==='string') {
             SYS1401.RCFG.shim[module] = SYS1401.RCFG.shim[module] || {};
             SYS1401.RCFG.shim[module].exports = exports;
+        }
+        if (deps) {
+            SYS1401.RCFG.shim[module] = SYS1401.RCFG.shim[module] || {};
+            SYS1401.RCFG.shim[module].deps = deps;
         }
     };
     // UpdateModulePaths() resets the requirejs path configuration using the SYS1401
