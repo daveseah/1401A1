@@ -59,16 +59,16 @@ define ([
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Construct() {
 
-	        var i, platform;
+			var i, platform;
 
 			var cam = RENDERER.Viewport().WorldCam3D();
 			var z = cam.position.z;
 			var fog = new THREE.Fog(0x000000,z-100,z+50);
 			RENDERER.SetWorldVisualFog(fog);
 
-	        /* add lights so mesh colors show */
+			/* add lights so mesh colors show */
 			var ambientLight = new THREE.AmbientLight(0x222222);
-	      	RENDERER.AddWorldVisual(ambientLight);
+			RENDERER.AddWorldVisual(ambientLight);
 
 			var directionalLight = new THREE.DirectionalLight(0xffffff);
 			directionalLight.position.set(1, 1, 1).normalize();
@@ -98,34 +98,59 @@ define ([
 			shipSprite.SetZoom(1.0);
 			RENDERER.AddWorldVisual(shipSprite);
 			var seq = {
-	            grid: { columns:2, rows:1, stacked:true },
-	            sequences: [
-	                { name: 'flicker', framecount: 2, fps:4 }
-	            ]
-	        };
-	        shipSprite.DefineSequences(SETTINGS.AssetPath('../demo/resources/crixa.png'),seq);
-	       	// shipSprite.PlaySequence("flicker");
-	        crixa = PIECEFACTORY.NewMovingPiece("crixa");
-	        crixa.SetVisual(shipSprite);
-	        crixa.SetPositionXYZ(0,0,0);
+				grid: { columns:2, rows:1, stacked:true },
+				sequences: [
+					{ name: 'flicker', framecount: 2, fps:4 }
+				]
+			};
+			shipSprite.DefineSequences(SETTINGS.AssetPath('../demo/resources/crixa.png'),seq);
+			// shipSprite.PlaySequence("flicker");
+			crixa = PIECEFACTORY.NewMovingPiece("crixa");
+			crixa.SetVisual(shipSprite);
+			crixa.SetPositionXYZ(0,0,0);
 
-	        // add extra shooting command
-	        crixa.Shoot = function ( bool ) {
-	        	if (bool) snd_pewpew.play();
-	        };
+			// add extra shooting command
+			crixa.Shoot = function ( bool ) {
+				if (bool) {
+					// snd_pewpew.play();
+					console.log(this.name,"shoot bullet");
+					// create a new bullet 
+					var bp = PIECEFACTORY.NewMovingPiece();
+					// var bvis = VISUALFACTORY.MakeDefaultSprite();
+					var sprPath = SETTINGS.AssetPath('../demo/resources/bullet32-blue.png');
+					var bvis = VISUALFACTORY.MakeStaticSprite( sprPath, function () {
+						bvis.SetZoom(1);
+					});
+					bp.SetVisual(bvis);	
+					RENDERER.AddWorldVisual(bvis);
 
-	        // demonstration of texture validity
-	        var textureLoaded = crixa.Visual().TextureIsLoaded();
-	        console.log("SHIP TEXTURE LOADED TEST OK?",textureLoaded);
-	        if (textureLoaded) {
+					// this.state.pos (Physics.vector) The position vector.
+					// this.state.vel (Physics.vector) The velocity vector.
+					// this.state.acc (Physics.vector) The acceleration vector.
+					// this.state.angular.pos (Number) The angular position (in radians, positive is clockwise starting along the x axis)
+					// this.state.angular.vel (Number) The angular velocity
+					// this.state.angular.acc (Number) The angular acceleration					
+					var vel = PHYSICS.vector(0.4, 0);
+					vel.rotate(this.body.state.angular.pos);
+					vel.vadd(this.body.state.vel);
+					bp.body.state.vel = vel;
+					bp.body.state.angular.pos = this.body.state.angular.pos;
+					bp.body.state.pos = this.body.state.pos.clone();
+				}
+			};
+
+			// demonstration of texture validity
+			var textureLoaded = crixa.Visual().TextureIsLoaded();
+			console.log("SHIP TEXTURE LOADED TEST OK?",textureLoaded);
+			if (textureLoaded) {
 				console.log(". spritesheet dim",crixa.Visual().TextureDimensions());
 				console.log(". sprite dim",crixa.Visual().SpriteDimensions());
-	        } else {
-	        	console.log(".. note textures load asynchronously, so the dimensions are not available yet...");
-	        	console.log(".. sprite class handles this automatically so you don't have to.");
-	        }
+			} else {
+				console.log(".. note textures load asynchronously, so the dimensions are not available yet...");
+				console.log(".. sprite class handles this automatically so you don't have to.");
+			}
 
-	        // make sprites
+			// make sprites
 			for (i=0;i<3;i++) {
 				platform = VISUALFACTORY.MakeStaticSprite(
 					SETTINGS.AssetPath('../demo/resources/teleport.png'),
