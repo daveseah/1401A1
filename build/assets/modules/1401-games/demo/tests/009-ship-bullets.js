@@ -117,6 +117,7 @@ define ([
 					// create a new bullet 
 					var bp = PIECEFACTORY.NewMovingPiece();
 					bp.body.radius = bp.body.geometry.radius = 2;
+					bp.body.mass = 0.1;
 					// var bvis = VISUALFACTORY.MakeDefaultSprite();
 					var sprPath = SETTINGS.AssetPath('../demo/resources/bullet32-blue.png');
 					var bvis = VISUALFACTORY.MakeStaticSprite( sprPath, function () {
