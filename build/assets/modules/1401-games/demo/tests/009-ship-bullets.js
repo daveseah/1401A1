@@ -116,6 +116,7 @@ define ([
 					console.log(this.name,"shoot bullet");
 					// create a new bullet 
 					var bp = PIECEFACTORY.NewMovingPiece();
+					bp.body.radius = bp.body.geometry.radius = 2;
 					// var bvis = VISUALFACTORY.MakeDefaultSprite();
 					var sprPath = SETTINGS.AssetPath('../demo/resources/bullet32-blue.png');
 					var bvis = VISUALFACTORY.MakeStaticSprite( sprPath, function () {
@@ -134,8 +135,15 @@ define ([
 					vel.rotate(this.body.state.angular.pos);
 					vel.vadd(this.body.state.vel);
 					bp.body.state.vel = vel;
+
 					bp.body.state.angular.pos = this.body.state.angular.pos;
-					bp.body.state.pos = this.body.state.pos.clone();
+					var hardpoint = PHYSICS.vector(15,0);
+					hardpoint.rotate(this.body.state.angular.pos);
+					hardpoint.vadd(this.body.state.pos);
+					bp.body.state.pos = hardpoint;
+
+					// tag bullet
+					bp.body.isBullet = true;
 				}
 			};
 
