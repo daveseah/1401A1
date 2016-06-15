@@ -41,7 +41,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	function startServer ( config ) {
+/*/ config is an object. It will be created if it doesn't exist. This is called
+	by gulpfile.js's runServer() function, which passes a yargs.argv object that
+	should be compatible with this code.
+/*/	function startServer ( config ) {
 
 		// close server if it's already running
 		var server_restart = (server) ? true : false;
@@ -54,6 +57,7 @@
 		config.liveReload = config.liveReload || {};
 		config.liveReload.enabled = config.liveReload.enabled || true;
 		config.isOptimize = config.isOptimize!==undefined;
+		config.port = config.port || EXPRESS_PORT;
 
 		// instantiate express app
 		app = express();
@@ -62,7 +66,7 @@
 		app.set('views', VIEWS_PATH);
 		app.engine(VIEWS_EXT, engines[VIEWS_COMPILER]);
 		app.set('view engine', VIEWS_EXT);
-		app.set('port', process.env.PORT || EXPRESS_PORT || 3000);
+		app.set('port', config.port || 3000);
 
 		// middleware declarations
 		app.use(compression());
