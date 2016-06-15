@@ -15,6 +15,7 @@
 	var del         = require('del');
 	var merge       = require('merge-stream');
 	var runseq      = require('run-sequence');
+	var argv  		= require('yargs').argv;
 
 	var BOWER       = 'bower_components/';
 	var PUBLIC      = 'public/';
@@ -156,9 +157,10 @@
 ///	UTILITY FUNCTIONS /////////////////////////////////////////////////////////
 ///	
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ Start up the server module
+/*/ Start up the server module, passing yargs.argv object, which will be
+	used as a configuration object by startServer
 /*/	function runServer() {
-		serverInstance = server1401.startServer();
+		serverInstance = server1401.startServer( argv );
 		server1401.startLiveReload();
 		// if changing watch path, make sure to change copy paths in tasks
 		gulp.watch(ASSETS+'modules/**', function ( event ) {

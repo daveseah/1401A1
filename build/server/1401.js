@@ -23,6 +23,7 @@
 	var tinylr;	// set by startLiveReload
 	var app; 	// set by startServer
 	var server;	// set by startServer
+	var config; // save configuration object from startServer()
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,19 +42,26 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	function startServer ( config ) {
+/*/ config is an object. It will be created if it doesn't exist. This is called
+	by gulpfile.js's runServer() function, which passes a yargs.argv object that
+	should be compatible with this code.
+/*/	function startServer ( cfg ) {
 
 		// close server if it's already running
 		var server_restart = (server) ? true : false;
-		if (server) {
+		if (server_restart) {
 			server.close();
 		}
 
-		// set defaults
-		config = config || {};
+		// initialize config from either passed value or as new object
+		config = cfg || {};
+		// set default values if not defined
 		config.liveReload = config.liveReload || {};
 		config.liveReload.enabled = config.liveReload.enabled || true;
-		config.isOptimize = config.isOptimize!==undefined;
+		// force optimize false always to use requirejs
+		config.isOptimize = false; // was config.isOptimize!==undefined;
+		config.liveReloadPort = config.liveport || LIVERELOAD_PORT;
+		config.port = config.port || EXPRESS_PORT;
 
 		// instantiate express app
 		app = express();
@@ -62,7 +70,7 @@
 		app.set('views', VIEWS_PATH);
 		app.engine(VIEWS_EXT, engines[VIEWS_COMPILER]);
 		app.set('view engine', VIEWS_EXT);
-		app.set('port', process.env.PORT || EXPRESS_PORT || 3000);
+		app.set('port', config.port || 3000);
 
 		// middleware declarations
 		app.use(compression());
@@ -84,7 +92,7 @@
 		var router = express.Router();
 		router.get('/', function(req, res) {
 			var fullURL = req.protocol+"://";
-			fullURL += req.hostname+':'+LIVERELOAD_PORT;
+			fullURL += req.hostname+':'+config.liveReloadPort;
 			fullURL += '/livereload.js';
 			res.render('index', {
 				reload: 	config.liveReload,
@@ -111,8 +119,9 @@
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function startLiveReload() {
 		tinylr = require('tiny-lr')();
-		tinylr.listen( LIVERELOAD_PORT, function () {
-			console.log(DP,'Live reload of assets is enabled',DP);
+		tinylr.listen( config.liveReloadPort, function () {
+			console.log(DP,'Live reload of assets is enabled, (port',
+				config.liveReloadPort+')',DP);
 		});
 	} // startLiveReload
 
@@ -127,7 +136,7 @@
 			}
 		});
 		console.log(FP,'reload:',fileName);
-		startServer();
+		startServer(config);
 	} // notifyLiveReload
 
 
