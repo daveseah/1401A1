@@ -76,7 +76,8 @@ if (window.SYS1401) {
         system.debug(true);
         //>>excludeEnd("build");
 
-        app.title = 'Engine1401A1';
+        // set this to empty string so "| title" isn't appended to window title
+        app.title = '';
 
         app.configurePlugins({
             router: true,
