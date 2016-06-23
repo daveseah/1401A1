@@ -39,6 +39,7 @@
 	var DP 				= '----------';
 	var NP				= '         !';
 	var FP				= '         *';
+	var ERRP			= '       ERR';
 
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -110,6 +111,7 @@
 			console.log(BP,'LAN ..... http://'+ip.address()+':'+app.get('port'));
 		});
 
+		// server is an instance of http.Server
 		return server;
 
 	} // startServer 
@@ -117,7 +119,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	function startLiveReload() {
+/*/ Called by gulpfile.js to enable livereload for browser-served files. Note
+	that livereload does NOT restart the Node server.
+/*/	function startLiveReload() {
 		tinylr = require('tiny-lr')();
 		tinylr.listen( config.liveReloadPort, function () {
 			console.log(DP,'Live reload of assets is enabled, (port',
@@ -128,7 +132,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	function notifyLiveReload (event) {
+/*/ Called by gulpfile when a livereload event has been detected.
+/*/	function notifyLiveReload (event) {
 		var fileName = require('path').relative(__dirname, event.path);
 		tinylr.changed({
 			body: {
@@ -140,8 +145,27 @@
 	} // notifyLiveReload
 
 
+///	PROPERTY ACCESS ////////////////////////////////////////////////////////////
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Return the Express App instance
+/*/ function getExpressApp() {
+		if (!app) 
+			console.log(ERRP,'server1401/getExpressApp: app is not yet defined');
+		return app;
+	}
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Return the HTTP Server instance
+/*/ function getServer () {
+		if (!server) 
+			console.log(ERRP,'server1401/getServer: server is not yet defined');
+		return server;
+	}
+
+
 ///	EXPORT ////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	module.exports.startServer 		= startServer;
 	module.exports.startLiveReload 	= startLiveReload;
 	module.exports.notifyLiveReload = notifyLiveReload;
+	module.exports.getServer 		= getServer;
+	module.exports.getExpressApp 	= getExpressApp;

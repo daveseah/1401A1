@@ -162,6 +162,10 @@
 /*/	function runServer() {
 		serverInstance = server1401.startServer( argv );
 		server1401.startLiveReload();
+
+		// if you need the express app instance:
+		// var app = server1401.getExpressApp();
+
 		// if changing watch path, make sure to change copy paths in tasks
 		gulp.watch(ASSETS+'modules/**', function ( event ) {
 			runseq (
