@@ -1,5 +1,5 @@
 {
-	"name":	"Engine-1401A1",
+	"name":	"engine-1401a1",
 	"version": "1.0.0",
 	"dependencies": {
 		"durandal": "2.1.0",
