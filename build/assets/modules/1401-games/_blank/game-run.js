@@ -1,4 +1,4 @@
-/* _blank/game-run.js */
+/* game-run.js */
 define ([
 	'1401/settings',
 	'1401/objects/sysloop',

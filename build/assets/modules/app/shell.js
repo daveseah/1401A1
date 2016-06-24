@@ -28,8 +28,8 @@ define([
             router.map([
                 { route: '', title:'Welcome', moduleId: 'app/viewmodels/welcome', nav: true },
                 { route: 'flickr', moduleId: 'app/viewmodels/flickr', nav: false },
-                { route: '_blank', title:'Blank', moduleId: '1401-games/_blank/game-init', nav: true },
-                { route: 'demo', title:'Demo', moduleId: '1401-games/demo/game-init', nav: true }
+                { route: '_blank', title:'Blank', moduleId: '1401-games/_blank/_appshell', nav: true },
+                { route: 'demo', title:'Demo', moduleId: '1401-games/demo/_appshell', nav: true }
             ]).buildNavigationModel();
             
             return router.activate();

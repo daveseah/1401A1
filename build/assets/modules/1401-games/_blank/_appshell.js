@@ -1,4 +1,4 @@
-/* game-init.js */
+/* _appshell.js */
 define ([ 
 	'1401/master',
 	'1401/js-extend/oop',		// returns empty object
@@ -11,7 +11,7 @@ define ([
 
 
 ///////////////////////////////////////////////////////////////////////////////
-/**	GAME-INIT ****************************************************************\
+/**	APPSHELL *****************************************************************\
 
 	This is a Durandal ViewModel that does the absolute minimum to start the
 	game engine. It returns properties (e.g. displayName) that are linked
@@ -28,7 +28,7 @@ define ([
 	var MOD = {};
 
 	MOD.displayName = 'Blank Template';
-	MOD.description = 'Put Your Description in game-init.js';
+	MOD.description = 'Put Your Description here in _appshell.js';
 
 	MOD.compositionComplete = function () {
 		MASTER.Start( this );
