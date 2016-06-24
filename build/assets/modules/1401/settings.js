@@ -35,18 +35,19 @@ define ([
 	var CURRENT_FRAME_NUM;	// current frame number (for debugging)
 
 	// set constant paths
+	var PATH_MODULES  	= 'modules/';
 	var PATH_1401 		= '1401/';
 	var PATH_1401_GAMES	= '1401-games/';
-	var URI_1401 		= 'modules/'+PATH_1401;
-	// this gets GameID() added during InitializePaths()
-	var URI_GAME_DIR 	= 'modules/'+PATH_1401_GAMES;
+	var URI_1401 		= PATH_MODULES + PATH_1401;
 	var FILE_SYS_SET 	= 'settings.yaml';
 	var MOD_GAME_RUN 	= 'game-run';	
 	var FILE_GAME_SET 	= 'game-settings.yaml';
+	// note that URI_GAME_DIR is overwritten with the ACTUAL module_id
+	// during InitializePaths()
+	var URI_GAME_DIR 	= PATH_MODULES + PATH_1401_GAMES;
 
 	// game-specific paths are loaded via m_InitializeGamePaths()
-	// and rely on GAME_ID being set
-	var GAME_ID;			// game id string (e.g. "demo")
+	var MODULE_ID;			// set by MASTER.mLoadGame()
 
 
 ///	ADD DEFAULT KEY,VALUES ///////////////////////////////////////////////////
@@ -97,13 +98,13 @@ define ([
 
 /// SYSTEM INITIALIZATION ////////////////////////////////////////////////////
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SETTINGS._Initialize = function ( gameId, viewModel ) {
+	SETTINGS._Initialize = function ( moduleId, viewModel ) {
 		if (VIEW_MODEL) {
 			// if VIEW_MODEL is defined, then we need to reload
 			// this application because a new tab was clicked
 			location.reload();
 		}
-		m_InitializeMeta ( gameId, viewModel );
+		m_InitializeMeta ( moduleId, viewModel );
 		m_InitializeGamePaths();
 
 	};
@@ -131,7 +132,7 @@ define ([
 		}
 		return CURRENT_FRAME_NUM;
 	};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+///	- - - - - - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - 
 /*/	Return the master time, in milliseconds. Used by system-related services;
 	Games should use the Timer class instead.
 /*/	SETTINGS.MasterTime = function () {
@@ -165,6 +166,20 @@ define ([
 		return URI_GAME_DIR+extra;
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+/*/	Return the GameID, which is the subdirectory in URI_GAME_DIR
+/*/	SETTINGS.GameID = function () {
+		if (MODULE_ID===undefined) 
+			console.error("GameID is invalid before MasterGameLoad");
+		return MODULE_ID.substr(MODULE_ID.lastIndexOf('/')+1);
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+/*/	Return the GameID, which is the subdirectory in URI_GAME_DIR
+/*/	SETTINGS.ModuleID = function () {
+		if (MODULE_ID===undefined) 
+			console.error("ModuleID is invalid before MasterGameLoad");
+		return MODULE_ID;
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*/	Return current game directory path, with <extra> added.
 	Useful for loading assets in the game directory. Checks if extra is
 	a URL and returns that so remote assets can be fetched; make sure
@@ -185,14 +200,6 @@ define ([
 		return URI_GAME_DIR+FILE_GAME_SET;
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-/*/	Return current 1401 GameID
-/*/	SETTINGS.GameID = function () {
-		if (GAME_ID) return GAME_ID;
-		else {
-			console.log('GameID is invalid before Master.Start()');
-		}
-	};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*/	Return current 1401 system path, with <extra> added.
 	Useful for loading assets in the 1401 system directory.
 /*/	SETTINGS.SystemURI = function ( extra ) {
@@ -202,8 +209,7 @@ define ([
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*/	Return path to game module "main" file, for use with requireJS in
 	master.js. Requires a FULL URI for dynamic use.
-/*/	SETTINGS.GameMainModulePath = function ( gameId ) {
-		gameId = gameId || this.GameID();
+/*/	SETTINGS.GameMainModulePath = function () {
 		if (URI_GAME_DIR===undefined) 
 			console.error("GameMainModule is invalid before MasterGameLoad");
 		return URI_GAME_DIR + MOD_GAME_RUN+'.js';
@@ -281,14 +287,14 @@ define ([
 /** MODULE PRIVATE FUNCTIONS ************************************************/
 //////////////////////////////////////////////////////////////////////////////
 
-	function m_InitializeMeta ( gameId, viewModel ) {
-		GAME_ID = gameId;
+	function m_InitializeMeta ( moduleId, viewModel ) {
+		MODULE_ID = moduleId;
 		VIEW_MODEL = viewModel;
 	}
 
 	function m_InitializeGamePaths() {
 		// game path (inside gamesdir)
-		URI_GAME_DIR = URI_GAME_DIR + GAME_ID + '/';
+		URI_GAME_DIR = PATH_MODULES + MODULE_ID + '/';
 	}
 
 	function m_Validate () {

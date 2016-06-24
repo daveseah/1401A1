@@ -64,6 +64,13 @@ if (window.SYS1401) {
     SYS1401.UpdateModulePaths = function () {
         requirejs.config(SYS1401.RCFG);
     };
+    // LocalPath( module ) returns a requireJS compatible module path
+    // relative to the current working directory of the running 1401 Game. 
+    // The actual function is set in MASTER.Start() in master.js
+    SYS1401.LocalPath = function ( moduleName ) {
+        throw "SYS1401.LocalPath() was called before MASTER.Start()";
+    };
+
 
 /// START DURANDAL CONFIGURATION //////////////////////////////////////////////
     SYS1401.UpdateModulePaths();

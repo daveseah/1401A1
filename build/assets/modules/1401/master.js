@@ -4,7 +4,6 @@ SYS1401.AddModulePath( '1401-games', '1401-games');
 SYS1401.AddModulePath( 'yaml', 'vendor/yaml.js/yaml','YAML' );
 SYS1401.AddModulePath( 'three', 'vendor-extra/three.min','THREE' );
 SYS1401.AddModulePath( 'physicsjs', 'vendor/physicsjs/physicsjs-full.min' );
-
 SYS1401.UpdateModulePaths();
 define ([
 	'plugins/router',
@@ -46,7 +45,6 @@ define ([
 	var MASTER = {};			// module API object
 	var _master = this;			// reference to 'this'
 
-
 //	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	This is called by the associated viewmodel on composition.Complete
 	The viewModel and gameId are passed for safekeeping
@@ -70,12 +68,10 @@ define ([
 		}
 		m_viewmodel = viewModel;
 
-		// get active route from Durandal router module
-		var gameId = router.activeInstruction().fragment;
-		if (!gameId) {
-			console.error('Master.Start: could not get router path to game-run.js');
-			return;
-		}
+		// Get the 1401-game module path by parsing the router's 
+		// moduleId (defined in shell.js router navigation array)
+		var moduleId = router.activeInstruction().config.moduleId;
+		moduleId = moduleId.substring(0,moduleId.lastIndexOf("/"));
 
 		// extend magic SYS1401 helper object with LocalPath()
 		SYS1401.LocalPath = function (moduleId) {
@@ -87,7 +83,7 @@ define ([
 		// load master settings asynchronously, then load game module
 		SETTINGS.Load (SETTINGS.SettingsURI(), _master, function () {
 			// select game to load
-			m_GameLoad ( gameId, viewModel );
+			m_GameLoad ( moduleId, viewModel );
 		});
 
 		// ...execution continues in m_GameLoad()
@@ -114,12 +110,12 @@ define ([
 /** SUPPORTING PRIVATE FUNCTIONS *********************************************/
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-/*/	Given the gameId, look for corresponding folder in the
+/*/	Given the moduleId, look for corresponding folder in the
 	activities directory, and load asyncronously.
 	TODO: Make re-entrant proof
-/*/	function m_GameLoad ( gameId, viewModel ) {
-		SETTINGS._Initialize( gameId, viewModel );
-		var module_path = SETTINGS.GameMainModulePath( gameId );
+/*/	function m_GameLoad ( moduleId, viewModel ) {
+		SETTINGS._Initialize( moduleId, viewModel );
+		var module_path = SETTINGS.GameMainModulePath( moduleId );
 		m_game = null;
 
 		/* load game module asynchronously */
