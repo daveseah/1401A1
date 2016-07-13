@@ -46,16 +46,11 @@
 /*/ config is an object. It will be created if it doesn't exist. This is called
 	by gulpfile.js's runServer() function, which passes a yargs.argv object that
 	should be compatible with this code.
-/*/	function startServer ( cfg ) {
-
-		// close server if it's already running
-		var server_restart = (server) ? true : false;
-		if (server_restart) {
-			server.close();
-		}
+/*/	function startServer ( yargsv ) {
 
 		// initialize config from either passed value or as new object
-		config = cfg || {};
+		// save as module-wide object
+		config = yargsv || {};
 		// set default values if not defined
 		config.liveReload = config.liveReload || {};
 		config.liveReload.enabled = config.liveReload.enabled || true;
@@ -63,6 +58,24 @@
 		config.isOptimize = false; // was config.isOptimize!==undefined;
 		config.liveReloadPort = config.liveport || LIVERELOAD_PORT;
 		config.port = config.port || EXPRESS_PORT;
+		config.ServerInitHook = config.ServerInitHook || null;
+
+		// if the server is not restarting, then just return
+		// the express app instance to caller
+		var server_restart = (server) ? true : false;
+		if (!server_restart) return startExpress();
+
+		// otherwise, close the server and invoke startExpress()
+		// when the server has completely closed to avoid
+		// EADDRESSINUSE errors
+		app = null;
+		server.close( startExpress ); // startExpress is a callback
+	}
+
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ continuing from startServer, startExpress is potentially called async
+	as a callback on liveReload event when the old server is closed.
+/*/	function startExpress () {
 
 		// instantiate express app
 		app = express();
@@ -103,9 +116,14 @@
 		});
 		app.use('/', router);
 
+		// for gulpfiles that need to do further configuration
+		// to the express app, this hook is provided
+		if (typeof (config.ServerInitHook)==='function') {
+			config.ServerInitHook( app );
+		}
+
 		// start it up
 		server = app.listen(app.get('port'), function() {
-			if (server_restart) return;
 			console.log(DP,'VISIT ONE OF THESE URLS in CHROME WEB BROWSER',DP);
 			console.log(BP,'LOCAL ... http://localhost:'+app.get('port'));
 			console.log(BP,'LAN ..... http://'+ip.address()+':'+app.get('port'));
