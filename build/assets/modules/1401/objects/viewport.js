@@ -29,6 +29,8 @@ define ([
 	/* constructor */
 	function Viewport ( name ) {
 		this.name = name || "viewport"+(viewport_count++);
+		// display mode
+		this.mode 			= Viewport.MODE_FIXED;
 		// viewport 
 		this.width 			= null;		// pixels
 		this.height 		= null;		// pixels
@@ -50,18 +52,21 @@ define ([
 		// mouseraycasting
 		this.pickers 		= null;		// subscribes to mouse click events
 	}
+	Viewport.MODE_FIXED 	= 'fixed';
+	Viewport.MODE_SCALED 	= 'scale';
+	Viewport.MODE_FLUID		= 'fluid';
 
 ///	INITIALIZATION ///////////////////////////////////////////////////////////
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// Step 1. Initialize the WebGL surface and size containers exactly
-	Viewport.method('InitializeRenderer', function ( width, height, containerId ) {
+	Viewport.method('InitializeRenderer', function ( mode, width, height, containerId ) {
 		if (this.webGL) {
 			console.error("Renderer already initialized");
 			return;
 		}
-		if (!(width && height && containerId)) {
-			console.error("Call InitializeRenderer() with cwidth, cheight, containerId");
+		if (!(mode && width && height && containerId)) {
+			console.error("Call InitializeRenderer() with mode, cwidth, cheight, containerId");
 			return;
 		}
 		if (typeof containerId !== 'string') {
@@ -91,6 +96,57 @@ define ([
 		$container.css('width',this.width);
 		$container.css('height',this.height);
 
+		/// CONSOLE DEBUG METHODS /////////////////////
+
+		window.SYS1401.CONTAINER = $container;
+		window.SYS1401.OVERLAY = $('#container #overlay');
+		window.SYS1401.WEBGL = this.webGL;
+
+		/* size a div to width, height in pixels */
+		window.SYS1401.sizeElement = function (el,w,h) {
+			if (!el) return "must pass element as arg1";
+			if (typeof w=='undefined') {
+				w = el.width();
+				h = el.height();
+				return "container is "+w+", "+h;
+			}
+			if (typeof h=='undefined') h = w;
+			el.width(w).height(h);
+			return "set width to "+w+", "+h;
+		};
+
+		/* size the webgl canvas to width, height in pixels */
+
+		window.SYS1401.glSize = function (w,h) {
+			var CAMWORLD = window.SYS1401.CAMWORLD;
+			var WEBGL 	= window.SYS1401.WEBGL;
+			if (typeof w=='undefined') {
+				w = WEBGL.domElement.width;
+				h = WEBGL.domElement.height;
+				return "glcanvas is "+w+", "+h;
+			}
+			if (typeof h=='undefined') h = w;
+			WEBGL.setSize(w,h);
+			if (CAMWORLD instanceof THREE.PerspectiveCamera) {
+				CAMWORLD.aspect = 	w/h;
+			}
+			if (CAMWORLD instanceof THREE.OrthographicCamera) {
+				CAMWORLD.left 	= -(w/2);
+				CAMWORLD.right 	= +(w/2);
+				CAMWORLD.top 	= +(h/2);
+				CAMWORLD.bottom = -(h/2);
+			}
+			CAMWORLD.updateProjectionMatrix();
+			return "glsetsize "+w+", "+h;
+		};
+
+		window.csize = function (w,h) {
+			return SYS1401.sizeElement(SYS1401.CONTAINER,w,h);
+		};
+		window.osize = function (w,h) {
+			return SYS1401.sizeElement(SYS1401.OVERLAY,w,h);
+		};
+
 
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,7 +154,7 @@ define ([
 	// specify the minimum guaranteed number of units to be shown in the current
 	// display. A value of 10 means that 10 units (-5 to 5) will be visible in
 	// world cameras
-	Viewport.method('InitializeWorld', function ( worldUnits ) {
+	Viewport.method('SizeWorldToViewport', function ( worldUnits ) {
 		if (!this.webGL) {
 			console.error("Call InitializeViewport() before calling InitializeWorld()");
 			return;
@@ -149,6 +205,8 @@ define ([
 
 		// assign default world camera as 2D
 		this.camWORLD = this.cam2D;
+		window.SYS1401.CAMWORLD = this.camWORLD;
+
 	});
 
 ///	CAMERAS AND DIMENSIONS ///////////////////////////////////////////////////
@@ -255,10 +313,12 @@ define ([
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Viewport.method('SelectWorld2D', function () {
 		this.camWORLD = this.cam2D;
+		SYS1401.CAMWORLD = this.camWORLD;
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Viewport.method('SelectWorld3D', function () {
 		this.camWORLD = this.cam3D;
+		SYS1401.CAMWORLD = this.camWORLD;
 	});
 
 ///	CAMERA UTILITIES /////////////////////////////////////////////////////////
