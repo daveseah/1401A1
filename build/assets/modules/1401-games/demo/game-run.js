@@ -9,6 +9,7 @@ define ([
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/renderer',
+	'1401/system/screen',
 /*** UNCOMMENT ONE TEST *****************************************************/
 //	SYS1401.LocalPath('tests/001-gameloop')
 //	SYS1401.LocalPath('tests/002-stars-finite')
@@ -18,12 +19,14 @@ define ([
 //	SYS1401.LocalPath('tests/006-btree-factory')
 //	SYS1401.LocalPath('tests/007-loadassets')
 //	SYS1401.LocalPath('tests/008-timer')
-	SYS1401.LocalPath('tests/009-ship-bullets')
+//	SYS1401.LocalPath('tests/009-ship-bullets')
+	SYS1401.LocalPath('tests/010-screen')
 ], function ( 
 	DBG,
 	SETTINGS,
 	SYSLOOP,
 	RENDERER,
+	SCREEN,
 	TEST
 ) {
 
@@ -60,8 +63,9 @@ define ([
 	var MAIN = SYSLOOP.InitializeGame('Game-Main');
 
 	// add handlers as needed
-	MAIN.SetHandler( 'Connect', API_HandleConnect );
-	MAIN.SetHandler( 'GameStep', API_GameStep );
+	MAIN.SetHandler( 'Connect'		, API_HandleConnect );
+	MAIN.SetHandler( 'Initialize'	, API_HandleInitialize );
+	MAIN.SetHandler( 'GameStep'		, API_GameStep );
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,19 +84,22 @@ define ([
 /*/	function API_HandleConnect ( viewModel ) {
 
 		m_viewmodel = viewModel;
-		console.log("MAIN: Initializing!");
-		var parm = {
-			attachTo: '#container',		// WebGL attaches to this
-			renderWidth: 768,			// width of render context
-			renderHeight: 768,			// height of render context
-			worldUnits: 768				// world units to fit in shortest dim
-		};
-		RENDERER.Initialize ( parm );
-		RENDERER.AutoRender();
+	}
 
-		// size the width of the debug window
-		$('#debug').css('width',parm.renderWidth+'px');
-		// debug.js defines window.DBG_Out() which writes to #debug
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Initialize() happens after Connect() is complete for all SYSLOOP modules.
+/*/	function API_HandleInitialize () {
+
+		// instead of initializing renderer directly,
+		// use SCREEN which will initialize it for us
+		var cfg = {
+			mode 			: 'fluid',		// layout mode
+			renderWidth 	: 768,			// width of render context
+			renderHeight 	: 768,			// height of render context
+			worldUnits 		: 768			// world units to fit in shortest dim
+		};
+		SCREEN.CreateLayout( cfg );
+
 	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

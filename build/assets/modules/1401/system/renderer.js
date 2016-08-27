@@ -51,13 +51,11 @@ define ([
 	worldUnits is the number of worldUnits to fit into the pixel viewport
 	crossOrigin is to allow non-server media assets to load
 /*/	API.Initialize = function ( parm ) {
-
 		// order of initialization is important
 		VIEWPORT.InitializeRenderer(
-			parm.displayMode || 'fixed',
 			parm.renderWidth,
 			parm.renderHeight,
-			parm.attachTo
+			parm.attachId
 		);
 
 		// using the renderWidth,Height as a 

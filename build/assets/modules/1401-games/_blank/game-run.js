@@ -3,11 +3,13 @@ define ([
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/renderer',
+	'1401/system/screen',
 	SYS1401.LocalPath('example-component')
 ], function ( 
 	SETTINGS,
 	SYSLOOP,
 	RENDERER,
+	SCREEN,
 	COMPONENT
 ) {
 
@@ -44,8 +46,9 @@ define ([
 	var MAIN = SYSLOOP.InitializeGame('Game-Run');
 
 	// add handlers as needed
-	MAIN.SetHandler( 'Connect', API_HandleConnect );
-	MAIN.SetHandler( 'GameStep', API_GameStep );
+	MAIN.SetHandler( 'Connect'		, API_HandleConnect );
+	MAIN.SetHandler( 'Initialize'	, API_HandleInitialize );
+	MAIN.SetHandler( 'GameStep'		, API_GameStep );
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,20 +70,22 @@ define ([
 
 		// save the viewmodel if we want it later
 		m_viewmodel = viewModel;
+	}
 
-		// initialize the renderer
-		var parm = {
-			attachTo: '#container',		// WebGL attaches to this
-			renderWidth: 768,			// width of render context
-			renderHeight: 768,			// height of render context
-			worldUnits: 768				// world units to fit in shortest dim
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Initialize() happens after Connect() is complete for all SYSLOOP modules.
+/*/	function API_HandleInitialize () {
+
+		// instead of initializing renderer directly,
+		// use SCREEN which will initialize it for us
+		var cfg = {
+			mode 			: 'scaled',		// layout mode
+			renderWidth 	: 768,			// width of render context
+			renderHeight 	: 768,			// height of render context
+			worldUnits 		: 768			// world units to fit in shortest dim
 		};
-		RENDERER.Initialize ( parm );
-		RENDERER.AutoRender();
+		SCREEN.CreateLayout( cfg );
 
-		// size the width of the debug window
-		$('#debug').css('width',parm.renderWidth+'px');
-		// debug.js defines window.DBG_Out() which writes to #debug
 	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

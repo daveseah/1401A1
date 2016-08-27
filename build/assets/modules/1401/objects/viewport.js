@@ -51,28 +51,35 @@ define ([
 		this.camSCREEN 		= null;		// screen (pixel coords)
 		// mouseraycasting
 		this.pickers 		= null;		// subscribes to mouse click events
+		// hacky access to constructor types
+		this.TYPE 			= Viewport;
 	}
 	Viewport.MODE_FIXED 	= 'fixed';
-	Viewport.MODE_SCALED 	= 'scale';
+	Viewport.MODE_SCALED 	= 'scaled';
 	Viewport.MODE_FLUID		= 'fluid';
 
 ///	INITIALIZATION ///////////////////////////////////////////////////////////
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// Step 1. Initialize the WebGL surface and size containers exactly
-	Viewport.method('InitializeRenderer', function ( mode, width, height, containerId ) {
+	Viewport.method('InitializeRenderer', function ( width, height, containerId ) {
 		if (this.webGL) {
 			console.error("Renderer already initialized");
 			return;
 		}
-		if (!(mode && width && height && containerId)) {
-			console.error("Call InitializeRenderer() with mode, cwidth, cheight, containerId");
+		if (!(width && height && containerId)) {
+			console.error("Call InitializeRenderer() with cwidth, cheight, containerId");
 			return;
 		}
+		// check format of containerId string
 		if (typeof containerId !== 'string') {
 			console.error("Provide a valid selector");
 			return;
+		} 
+		if (containerId.charAt(0)!=='#') {
+			containerId = '#'+containerId;
 		}
+
 		var $container = $(containerId);
 		if (!$container) {
 			console.error("container",containerId,"does not exist");
@@ -118,6 +125,7 @@ define ([
 		/* size the webgl canvas to width, height in pixels */
 
 		window.SYS1401.glSize = function (w,h) {
+			instance.SetDimensions(w,h);
 			var CAMWORLD = window.SYS1401.CAMWORLD;
 			var WEBGL 	= window.SYS1401.WEBGL;
 			if (typeof w=='undefined') {
@@ -358,7 +366,6 @@ define ([
 		return d;
 
 	}
-
 
 
 
