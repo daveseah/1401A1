@@ -93,10 +93,10 @@ define ([
 		// instead of initializing renderer directly,
 		// use SCREEN which will initialize it for us
 		var cfg = {
-			mode 			: 'fluid',		// layout mode (fixed default)
-			renderWidth 	: 768,			// width of render context
-			renderHeight 	: 768,			// height of render context
-			worldUnits 		: 768			// world units to fit in shortest dim
+			mode 			: 'fluid',		// layout mode
+			renderWidth 	: 768,			// width of viewport
+			renderHeight 	: 768,			// height of viewport
+			worldUnits 		: 768			// world units visible in viewport
 		};
 		SCREEN.CreateLayout( cfg );
 
