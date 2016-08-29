@@ -69,7 +69,7 @@ define ( [
 			console.warn("SCREEN requires div #"+id,"element");
 			return;
 		} 
-		console.log("FYI, SCREEN is overwriting contents of",id);
+		console.info("SCREEN CONNECT: overwriting contents of",id);
 		// define main areas
 		m_root = root = $(root);
 		root.empty();
@@ -88,6 +88,7 @@ define ( [
 		SCREEN.Main.css('position','relative');
 		SCREEN.Overlay.css('position','absolute');
 
+		/* size a div to width, height in pixels */
 	});
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,6 +99,10 @@ define ( [
 		}
 		// check parameters
 		u_NormalizeConfig( cfg );
+
+		// info
+		console.info('SCREEN.CreateLayout is creating',cfg.mode,'layout');
+
 		// add 'attachTo' parameter for RENDERER 
 		cfg.attachId = m_renderer_id;
 		// save configuration for later adjustment
@@ -112,6 +117,8 @@ define ( [
 		}
 		// Start renderer
 		RENDERER.Initialize ( cfg );
+		window.SYS1401.WEBGL = VIEWPORT.WebGL();
+
 
 		// dispatch correct display mode
 		switch (cfg.mode) {
@@ -138,23 +145,33 @@ define ( [
 	}; 
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.SetFixedLayout = function ( cfg ) {
+/*/	Renderer is in the upper left and doesn't change size
+/*/	SCREEN.SetFixedLayout = function ( cfg ) {
 		console.log("SCREEN: setting fixed layout");
 		u_SetAbsoluteSize( SCREEN.Overlay, cfg );
 };
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.SetScaledLayout = function ( cfg ) {
-		console.log("SCREEN: setting scaled layout");
+/*/	set position absolute to cfg dimensions
+/*/	function u_SetAbsoluteSize ( jsel, cfg ) {
+		jsel.css('width',cfg.renderWidth);
+		jsel.css('height',cfg.renderHeight);
+		jsel.css('position','absolute');
+	}
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ a scaled lout will size itself to fit within the available space
+/*/	SCREEN.SetScaledLayout = function ( cfg ) {
 		// resize viewport on browser resize after 250ms
 		$(window).resize(function () {
 			clearTimeout(m_resize_timer);
-			m_resize_timer = setTimeout(u_ScaleRendererToFit,250);
+			m_resize_timer = setTimeout(u_ScaleRendererToFit,500);
 		});
 		u_ScaleRendererToFit();
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	function u_ScaleRendererToFit () {
+/*/	When scaling the renderer, we don't need to adjust any camera parameters
+/*/	function u_ScaleRendererToFit () {
 		var dim = u_GetBrowserDimensions();
+
 		var canvas = $(VIEWPORT.WebGLCanvas());
 		canvas.css('width',dim.scaledWidth);
 		canvas.css('height',dim.scaledHeight);
@@ -162,32 +179,24 @@ define ( [
 		SCREEN.Overlay.css('height',dim.scaledHeight);
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.SetFluidLayout = function ( cfg ) {
-		console.log("SCREEN: setting fluid layout");
+/*/	a fluid layout resizes itself to fill all available space
+/*/	SCREEN.SetFluidLayout = function ( cfg ) {
 		// resize viewport on browser resize after 250ms
 		$(window).resize(function () {
 			clearTimeout(m_resize_timer);
-			m_resize_timer = setTimeout(u_SizeRendererToFit,250);
+			m_resize_timer = setTimeout(u_ResizeRendererToFit,250);
 		});
-		u_SizeRendererToFit();
+		u_ResizeRendererToFit();
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	function u_SizeRendererToFit () {
+/*/	When resizing the renderer, we need to adjust camera parameters so 
+	the world is still drawn 1:1
+/*/	function u_ResizeRendererToFit () {
 		var dim = u_GetBrowserDimensions();
-		SYS1401.glSize(dim.boxWidth, dim.boxHeight);
-		var hh = Math.floor(dim.boxHeight / 2);
-		var ww = Math.floor(dim.boxWidth / 2);
-		var cam = SYS1401.CAMWORLD;
-		if (cam instanceof THREE.OrthographicCamera) {
-			cam.top 	= +hh;
-			cam.bottom 	= -hh;
-			cam.left 	= -ww;
-			cam.right 	= +ww;
-		}
-		if (cam instanceof THREE.PerspectiveCamera) {
-			cam.aspect = dim.boxWidth/dim.boxHeight;
-		}
-		cam.updateProjectionMatrix();
+
+		VIEWPORT.SetDimensions(dim.boxWidth, dim.boxHeight);
+		VIEWPORT.UpdateWorldCameras();
+		VIEWPORT.UpdateViewportCameras();
 	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -216,7 +225,7 @@ define ( [
 			displayHeight / m_cfg.renderHeight
 		);
 		scaledHeight 	= Math.floor(m_cfg.renderHeight * multiplier);
-		scaledWidth		= scaledHeight * aspect;
+		scaledWidth		= Math.floor(scaledHeight * aspect);
 
 		return {
 			visWidth 		: displayWidth,		// client area
@@ -228,13 +237,7 @@ define ( [
 		};
 	}
 
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	set position absolute to cfg dimensions
-/*/	function u_SetAbsoluteSize ( jsel, cfg ) {
-		jsel.css('width',cfg.renderWidth);
-		jsel.css('height',cfg.renderHeight);
-		jsel.css('position','absolute');
-	}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /** SCREEN API ***************************************************************/

@@ -62,6 +62,7 @@ define ([
 
 			var i, platform;
 
+			RENDERER.SelectWorld3D();
 			var cam = RENDERER.Viewport().WorldCam3D();
 			var z = cam.position.z;
 			var fog = new THREE.Fog(0x000000,z-100,z+50);
@@ -198,7 +199,6 @@ define ([
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Start() {
-		RENDERER.SelectWorld3D();
 		SHIPCONTROLS.BindKeys();
 
 		window.DBG_Out( "TEST 10 <b>Screen Modes!</b>" );

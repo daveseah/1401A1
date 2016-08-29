@@ -4,12 +4,16 @@ define ([
 	'1401/objects/sysloop',
 	'1401/system/renderer',
 	'1401/system/screen',
+	'1401/system/visualfactory',
+	'1401/system/piecefactory',
 	SYS1401.LocalPath('example-component')
 ], function ( 
 	SETTINGS,
 	SYSLOOP,
 	RENDERER,
 	SCREEN,
+	VISUALFACTORY,
+	PIECEFACTORY,
 	COMPONENT
 ) {
 
@@ -48,6 +52,7 @@ define ([
 	// add handlers as needed
 	MAIN.SetHandler( 'Connect'		, API_HandleConnect );
 	MAIN.SetHandler( 'Initialize'	, API_HandleInitialize );
+	MAIN.SetHandler( 'Construct'	, API_HandleConstruct );
 	MAIN.SetHandler( 'GameStep'		, API_GameStep );
 
 
@@ -65,7 +70,6 @@ define ([
 	opportunity to save a reference if it needs to access the HTML
 	layer of code (knockout variables, for example)
 /*/	function API_HandleConnect ( viewModel ) {
-
 		console.log("MAIN: Initializing!");
 
 		// save the viewmodel if we want it later
@@ -87,7 +91,25 @@ define ([
 		SCREEN.CreateLayout( cfg );
 
 	}
-
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Construct() happens after Iniitialize is complete for all SYSLOOP modules.
+/*/	function API_HandleConstruct () {
+		/* make crixa ship */
+		var shipSprite = VISUALFACTORY.MakeDefaultSprite();
+		shipSprite.SetZoom(1.0);
+		RENDERER.AddWorldVisual(shipSprite);
+		var seq = {
+			grid: { columns:2, rows:1, stacked:true },
+			sequences: [
+				{ name: 'flicker', framecount: 2, fps:4 }
+			]
+		};
+		shipSprite.DefineSequences(SETTINGS.AssetPath('../demo/resources/crixa.png'),seq);
+		// shipSprite.PlaySequence("flicker");
+		crixa = PIECEFACTORY.NewMovingPiece("crixa");
+		crixa.SetVisual(shipSprite);
+		crixa.SetPositionXYZ(0,0,0);
+	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	MasterStep is a method reserved for the 'master game loop', which is
 	established by the SYSLOOP.InitializeGame() call. MasterStep() is 
