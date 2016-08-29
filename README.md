@@ -16,14 +16,14 @@ Install **Git** and **Node** if you haven't already. You will be using a **termi
 (2) Clone the repository from **Github** into a folder where you will keep your development files. I use `~/Dev` on my Mac, but of course you can use anything you want:
 ```
   > cd /your/dev/folder
-  > git clone https://github.com/daveseah/Engine-1401A1.git
+  > git clone https://github.com/daveseah/1401A1.git
 ```
 
-This will create a folder called `Engine-1401A1` inside your dev folder that contains the project files.
+This will create a folder called `1401A1` inside your dev folder that contains the project files.
 
 (3) Install the **project's server-side dependencies**. This will be done by invoking `npm install` once; the dependencies are already specified in the `package.json` file, so this will be pretty painless:
 ```
-  > cd Engine-1401A1
+  > cd 1401A1
   > cd build
   > npm install
 ```
