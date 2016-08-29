@@ -3,11 +3,17 @@ define ([
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/renderer',
+	'1401/system/screen',
+	'1401/system/visualfactory',
+	'1401/system/piecefactory',
 	SYS1401.LocalPath('example-component')
 ], function ( 
 	SETTINGS,
 	SYSLOOP,
 	RENDERER,
+	SCREEN,
+	VISUALFACTORY,
+	PIECEFACTORY,
 	COMPONENT
 ) {
 
@@ -44,8 +50,10 @@ define ([
 	var MAIN = SYSLOOP.InitializeGame('Game-Run');
 
 	// add handlers as needed
-	MAIN.SetHandler( 'Connect', API_HandleConnect );
-	MAIN.SetHandler( 'GameStep', API_GameStep );
+	MAIN.SetHandler( 'Connect'		, API_HandleConnect );
+	MAIN.SetHandler( 'Initialize'	, API_HandleInitialize );
+	MAIN.SetHandler( 'Construct'	, API_HandleConstruct );
+	MAIN.SetHandler( 'GameStep'		, API_GameStep );
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,27 +70,47 @@ define ([
 	opportunity to save a reference if it needs to access the HTML
 	layer of code (knockout variables, for example)
 /*/	function API_HandleConnect ( viewModel ) {
-
 		console.log("MAIN: Initializing!");
 
 		// save the viewmodel if we want it later
 		m_viewmodel = viewModel;
-
-		// initialize the renderer
-		var parm = {
-			attachTo: '#container',		// WebGL attaches to this
-			renderWidth: 768,			// width of render context
-			renderHeight: 768,			// height of render context
-			worldUnits: 768				// world units to fit in shortest dim
-		};
-		RENDERER.Initialize ( parm );
-		RENDERER.AutoRender();
-
-		// size the width of the debug window
-		$('#debug').css('width',parm.renderWidth+'px');
-		// debug.js defines window.DBG_Out() which writes to #debug
 	}
 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Initialize() happens after Connect() is complete for all SYSLOOP modules.
+/*/	function API_HandleInitialize () {
+
+		// instead of initializing renderer directly,
+		// use SCREEN which will initialize it for us
+		var cfg = {
+			mode 			: 'scaled',		// layout mode
+			renderWidth 	: 768,			// width of viewport
+			renderHeight 	: 768,			// height of viewport
+			worldUnits 		: 768			// world units visible in viewport
+		};
+		SCREEN.CreateLayout( cfg );
+		SCREEN.SetInfo('<h4>PlanTitle</h4><p>Starter tempalte</p>');
+		SCREEN.SetDisplayMargin(20);
+	}
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Construct() happens after Iniitialize is complete for all SYSLOOP modules.
+/*/	function API_HandleConstruct () {
+		/* make crixa ship */
+		var shipSprite = VISUALFACTORY.MakeDefaultSprite();
+		shipSprite.SetZoom(1.0);
+		RENDERER.AddWorldVisual(shipSprite);
+		var seq = {
+			grid: { columns:2, rows:1, stacked:true },
+			sequences: [
+				{ name: 'flicker', framecount: 2, fps:4 }
+			]
+		};
+		shipSprite.DefineSequences(SETTINGS.AssetPath('../demo/resources/crixa.png'),seq);
+		// shipSprite.PlaySequence("flicker");
+		crixa = PIECEFACTORY.NewMovingPiece("crixa");
+		crixa.SetVisual(shipSprite);
+		crixa.SetPositionXYZ(0,0,0);
+	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	MasterStep is a method reserved for the 'master game loop', which is
 	established by the SYSLOOP.InitializeGame() call. MasterStep() is 

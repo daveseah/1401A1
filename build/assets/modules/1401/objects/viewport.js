@@ -29,11 +29,13 @@ define ([
 	/* constructor */
 	function Viewport ( name ) {
 		this.name = name || "viewport"+(viewport_count++);
+		// display mode
+		this.mode 			= Viewport.MODE_FIXED;
 		// viewport 
 		this.width 			= null;		// pixels
 		this.height 		= null;		// pixels
 		this.aspect 		= null;
-		this.containerId 	= null;		// #container
+		this.$container 	= null;		// jquery container object
 		this.webGL 			= null;		// WebGL renderer object
 		// world
 		this.worldOrigin 	= null;		// where world cams are looking
@@ -49,7 +51,12 @@ define ([
 		this.camSCREEN 		= null;		// screen (pixel coords)
 		// mouseraycasting
 		this.pickers 		= null;		// subscribes to mouse click events
+		// hacky access to constructor types
+		this.TYPE 			= Viewport;
 	}
+	Viewport.MODE_FIXED 	= 'fixed';
+	Viewport.MODE_SCALED 	= 'scaled';
+	Viewport.MODE_FLUID		= 'fluid';
 
 ///	INITIALIZATION ///////////////////////////////////////////////////////////
 
@@ -64,10 +71,15 @@ define ([
 			console.error("Call InitializeRenderer() with cwidth, cheight, containerId");
 			return;
 		}
+		// check format of containerId string
 		if (typeof containerId !== 'string') {
 			console.error("Provide a valid selector");
 			return;
+		} 
+		if (containerId.charAt(0)!=='#') {
+			containerId = '#'+containerId;
 		}
+
 		var $container = $(containerId);
 		if (!$container) {
 			console.error("container",containerId,"does not exist");
@@ -75,21 +87,74 @@ define ([
 		}
 
 		// save values
-		this.width = width;
-		this.height = height;
-		this.containerId = containerId;
-		this.aspect = width / height;
+		this.width 		= width;
+		this.height 	= height;
+		this.$container = $container;
+		this.aspect 	= width / height;
 
 		// create renderer, then attach it
 		this.webGL = new THREE.WebGLRenderer();
 		this.webGL.autoClear = false;
-		$container.append(this.webGL.domElement);
+		this.$container.append(this.webGL.domElement);
 
 		// set the renderer size
 		this.webGL.setSize(this.width,this.height);
 		// set the container dimensions as well
-		$container.css('width',this.width);
-		$container.css('height',this.height);
+		this.$container.css('width',this.width);
+		this.$container.css('height',this.height);
+
+		/// CONSOLE DEBUG METHODS /////////////////////
+
+		window.SYS1401.CONTAINER 	= $container;
+		window.SYS1401.OVERLAY 		= $('#renderer-overlay');
+		window.SYS1401.WEBGL 		= this.webGL;
+
+		/* size a div to width, height in pixels */
+		window.SYS1401.sizeElement = function (el,w,h) {
+			if (!el) return "must pass element as arg1";
+			if (typeof w=='undefined') {
+				w = el.width();
+				h = el.height();
+				return "is "+w+", "+h;
+			}
+			if (typeof h=='undefined') h = w;
+			el.width(w).height(h);
+			return "set to "+w+", "+h;
+		};
+
+		/* size the webgl canvas to width, height in pixels */
+		/* do not call in code */
+
+		window.SYS1401.glSize = function (w,h) {
+			instance.SetDimensions(w,h);
+			var CAMWORLD = window.SYS1401.CAMWORLD;
+			var WEBGL 	= window.SYS1401.WEBGL;
+			if (typeof w=='undefined') {
+				w = WEBGL.domElement.width;
+				h = WEBGL.domElement.height;
+				return "glcanvas is "+w+", "+h;
+			}
+			if (typeof h=='undefined') h = w;
+			WEBGL.setSize(w,h);
+			if (CAMWORLD instanceof THREE.PerspectiveCamera) {
+				CAMWORLD.aspect = 	w/h;
+			}
+			if (CAMWORLD instanceof THREE.OrthographicCamera) {
+				CAMWORLD.left 	= -(w/2);
+				CAMWORLD.right 	= +(w/2);
+				CAMWORLD.top 	= +(h/2);
+				CAMWORLD.bottom = -(h/2);
+			}
+			CAMWORLD.updateProjectionMatrix();
+			return "glsetsize "+w+", "+h;
+		};
+
+		window.SYS1401.rSize = function (w,h) {
+			return 'renderer div '+SYS1401.sizeElement(SYS1401.CONTAINER,w,h);
+		};
+		window.SYS1401.roSize = function (w,h) {
+			return 'renderer overlay div '+SYS1401.sizeElement(SYS1401.OVERLAY,w,h);
+		};
 
 
 	});
@@ -98,7 +163,7 @@ define ([
 	// specify the minimum guaranteed number of units to be shown in the current
 	// display. A value of 10 means that 10 units (-5 to 5) will be visible in
 	// world cameras
-	Viewport.method('InitializeWorld', function ( worldUnits ) {
+	Viewport.method('SizeWorldToViewport', function ( worldUnits ) {
 		if (!this.webGL) {
 			console.error("Call InitializeViewport() before calling InitializeWorld()");
 			return;
@@ -149,12 +214,15 @@ define ([
 
 		// assign default world camera as 2D
 		this.camWORLD = this.cam2D;
+		// update debug reference
+		window.SYS1401.CAMWORLD = this.camWORLD;
+
 	});
 
 ///	CAMERAS AND DIMENSIONS ///////////////////////////////////////////////////
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// for updating when browser size changes (TBD)
+	// for updating when browser size changes (see SCREEN module)
 	Viewport.method('SetDimensions',function ( width, height ){
 		if (!this.webGL) {
 			console.error("WebGL is not initialized");
@@ -165,7 +233,21 @@ define ([
 		if (!(width && height && this.webGL)) {
 			console.error("ViewPort requires valid width and height. Did you InitializeRenderer()?");
 		}
-		this.aspect = width/height;
+
+		// save values
+		this.width 	= width;
+		this.height = height;
+		this.aspect = width / height;
+
+		// set the renderer size
+		this.webGL.setSize(this.width, this.height);
+		// set the container dimensions as well
+		this.$container.css('width',this.width);
+		this.$container.css('height',this.height);
+		var $canvas = $(this.WebGLCanvas());
+		$canvas.css('width',this.width);
+		$canvas.css('height',this.height);
+
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Viewport.method('Dimensions', function () {
@@ -179,6 +261,7 @@ define ([
 		};
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// update world cameras based on current viewport properties
 	Viewport.method('UpdateWorldCameras', function () {
 
 		var whw = this.width * this.worldScale / 2;
@@ -192,21 +275,19 @@ define ([
 		this.cam2D.top 		= +whh+woy;
 		this.cam2D.bottom 	= -whh+woy;
 
-		// update world3d camera by positioning it
-		// to default see the entire world
-		var d = m_GetFramingDistance(this.cam3D,whw,whh);
+		// update aspect
+		this.cam3D.aspect = this.aspect;
 
-		this.cam3D.position.z = d;
-		this.cam2D.position.z = d;
-
+		// update project matrices
 		this.cam2D.updateProjectionMatrix();
 		this.cam3D.updateProjectionMatrix();
 
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// update 2D cameras based on current viewport properties
 	Viewport.method('UpdateViewportCameras', function () {
-		var hw = this.width/2;
-		var hh = this.height/2;
+		var hw = this.width / 2;
+		var hh = this.height / 2;
 		this.camBG.left 	= -hw;
 		this.camBG.right	= +hw;
 		this.camBG.top		= +hh;
@@ -219,6 +300,19 @@ define ([
 
 		this.camBG.updateProjectionMatrix();
 		this.camSCREEN.updateProjectionMatrix();
+	});
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// reposition camera to show a the current worldscale within the
+	// given viewport dimensions
+	Viewport.method('FrameToWorld', function () {
+		var whw = this.width * this.worldScale / 2;
+		var whh = this.height * this.worldScale / 2;
+		// update world3d camera by positioning it
+		// to default see the entire world
+		var d = m_GetFramingDistance(this.cam3D,whw,whh);
+		// update camera distances
+		this.cam3D.position.z = d;
+		this.cam2D.position.z = d;
 	});
 
 ///	ACCESSOR METHODS /////////////////////////////////////////////////////////
@@ -255,10 +349,12 @@ define ([
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Viewport.method('SelectWorld2D', function () {
 		this.camWORLD = this.cam2D;
+		SYS1401.CAMWORLD = this.camWORLD;
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	Viewport.method('SelectWorld3D', function () {
 		this.camWORLD = this.cam3D;
+		SYS1401.CAMWORLD = this.camWORLD;
 	});
 
 ///	CAMERA UTILITIES /////////////////////////////////////////////////////////
@@ -278,7 +374,9 @@ define ([
 
 
 /**	SUPPORT FUNCTIONS *******************************************************/
-
+	// calculates how far a 3D camera with a particular
+	// FOV needs to move back to show fWidth and fHeight
+	// pixels. Used to frame a particular number of world units
 	function m_GetFramingDistance ( cam3D, fWidth, fHeight ) {
 
 		var safety = 0.5;
@@ -298,7 +396,6 @@ define ([
 		return d;
 
 	}
-
 
 
 

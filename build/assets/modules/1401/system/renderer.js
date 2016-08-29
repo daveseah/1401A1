@@ -46,16 +46,21 @@ define ([
 ///	RENDER INIT & CONTROL ////////////////////////////////////////////////////
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Initialize Rendersystem 
+	displayMode is fixed, scaled, or fluid
+	renderWidth, renderHeight, attachTo are required
+	worldUnits is the number of worldUnits to fit into the pixel viewport
+	crossOrigin is to allow non-server media assets to load
 /*/	API.Initialize = function ( parm ) {
-
 		// order of initialization is important
 		VIEWPORT.InitializeRenderer(
 			parm.renderWidth,
 			parm.renderHeight,
-			parm.attachTo
+			parm.attachId
 		);
-		VIEWPORT.InitializeWorld(
-			parm.worldUnits
+
+		// using the renderWidth,Height as a 
+		VIEWPORT.SizeWorldToViewport(
+			parm.worldUnits || Math.min(parm.renderWidth, parm.renderHeight)
 		);
 		VIEWPORT.InitializeCameras();
 
@@ -236,7 +241,10 @@ define ([
 	API.Viewport = function () {
 		return VIEWPORT;
 	};
-
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	API.Resize = function ( w, h ) {
+		window.SYS1401.glSize(w,h);
+	};
 
 
 ///	BACKGROUND IMAGE /////////////////////////////////////////////////////////
