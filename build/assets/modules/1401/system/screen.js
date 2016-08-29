@@ -69,9 +69,11 @@ define ( [
 			console.warn("SCREEN requires div #"+id,"element");
 			return;
 		} 
-		console.info("SCREEN CONNECT: appending to div#",id);
 		// define main areas
 		m_root = root = $(root);
+		if (m_root.children().length) {
+			console.warn('SCREEN is erasing existing children of div#'+id);
+		}
 		root.empty();
 		root.append( '<div id="nfo1401"></div>' );
 		root.append( '<div id="'+m_renderer_id+'"></div>' );
@@ -110,7 +112,7 @@ define ( [
 		u_NormalizeConfig( cfg );
 
 		// info
-		console.info('SCREEN.CreateLayout is creating',cfg.mode,'layout');
+		console.info('SCREEN is setting-up',cfg.mode,'layout');
 
 		// add 'attachTo' parameter for RENDERER 
 		cfg.attachId = m_renderer_id;
