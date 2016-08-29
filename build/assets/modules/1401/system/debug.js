@@ -1,6 +1,8 @@
 /* debug.js */
 define ([
+	'1401/system/screen'	
 ], function ( 
+	SCREEN
 ) {
 
 	var DBGOUT = true;
@@ -18,7 +20,6 @@ define ([
 	API.name = "debug";
 
 	var m_watching = {};
-	var m_debug_selector = '#debug';
 
 
 ///	INSPECTION ROUTINES //////////////////////////////////////////////////////
@@ -166,7 +167,7 @@ define ([
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Debugger window text output
 /*/	function m_DebugOut ( msg, escape_msg, selector ) {
-		selector = selector || m_debug_selector;
+		selector = selector || SCREEN.Debug;
 		var $dbg = $(selector);
 		if (Object.prototype.toString.call(e)==='[object Array]') {
 			$dbg = e[0];		// get first matching element
