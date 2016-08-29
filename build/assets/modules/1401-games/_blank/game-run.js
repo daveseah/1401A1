@@ -89,7 +89,8 @@ define ([
 			worldUnits 		: 768			// world units to fit in shortest dim
 		};
 		SCREEN.CreateLayout( cfg );
-
+		SCREEN.SetInfo('<h4>PlanTitle</h4><p>Starter tempalte</p>');
+		SCREEN.SetDisplayMargin(20);
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Construct() happens after Iniitialize is complete for all SYSLOOP modules.

@@ -93,7 +93,7 @@ define ([
 		// instead of initializing renderer directly,
 		// use SCREEN which will initialize it for us
 		var cfg = {
-			mode 			: 'fluid',		// layout mode
+			mode 			: 'fluid',		// layout mode (fixed default)
 			renderWidth 	: 768,			// width of render context
 			renderHeight 	: 768,			// height of render context
 			worldUnits 		: 768			// world units to fit in shortest dim

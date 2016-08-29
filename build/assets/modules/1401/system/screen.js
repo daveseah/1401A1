@@ -69,7 +69,7 @@ define ( [
 			console.warn("SCREEN requires div #"+id,"element");
 			return;
 		} 
-		console.info("SCREEN CONNECT: overwriting contents of",id);
+		console.info("SCREEN CONNECT: appending to div#",id);
 		// define main areas
 		m_root = root = $(root);
 		root.empty();
@@ -87,8 +87,17 @@ define ( [
 		// make basic CSS rules
 		SCREEN.Main.css('position','relative');
 		SCREEN.Overlay.css('position','absolute');
+		SCREEN.Overlay.css('top',0);
 
-		/* size a div to width, height in pixels */
+		// add debug styling.
+		SCREEN.Debug.css('font-size','12px');
+		SCREEN.Debug.css('overflow-y','scroll');
+		SCREEN.Debug.css('line-height','1.5em');
+		SCREEN.Debug.css('height','9em');
+		SCREEN.Debug.css('background-color','rgba(192,192,192,0.5)');
+		// add info styling
+		SCREEN.Info.css('font-size','smaller');
+
 	});
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -135,10 +144,6 @@ define ( [
 				throw "mode "+cfg.mode+" not implemented";
 		}
 
-		// size the width of the debug window
-		SCREEN.Debug.css('width',cfg.renderWidth);
-		// debug.js defines window.DBG_Out() which writes to #debug
-
 		// start renderer refresh
 		RENDERER.AutoRender();
 
@@ -156,17 +161,25 @@ define ( [
 		jsel.css('width',cfg.renderWidth);
 		jsel.css('height',cfg.renderHeight);
 		jsel.css('position','absolute');
+		var dim = u_GetBrowserDimensions();
+		SCREEN.Info.css('width',cfg.renderWidth);
+		SCREEN.Debug.css('width',cfg.renderWidth);
+
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ a scaled lout will size itself to fit within the available space
 /*/	SCREEN.SetScaledLayout = function ( cfg ) {
+		// hide nfo and debug because this messes up dimensions
+		// until it's rewritten to take Debug and Info into account
+		SCREEN.Debug.hide();
+		SCREEN.Info.hide();
 		// resize viewport on browser resize after 250ms
 		$(window).resize(function () {
 			clearTimeout(m_resize_timer);
 			m_resize_timer = setTimeout(u_ScaleRendererToFit,500);
 		});
 		u_ScaleRendererToFit();
-	};
+	}; 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	When scaling the renderer, we don't need to adjust any camera parameters
 /*/	function u_ScaleRendererToFit () {
@@ -177,10 +190,18 @@ define ( [
 		canvas.css('height',dim.scaledHeight);
 		SCREEN.Overlay.css('width',dim.scaledWidth);
 		SCREEN.Overlay.css('height',dim.scaledHeight);
+		SCREEN.Main.css('width',dim.scaledWidth);
+		SCREEN.Main.css('height',dim.scaledHeight);
+
+		SCREEN.Debug.css('width',dim.scaledWidth);
+		SCREEN.Debug.css('top',dim.boxBottom+'px');
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	a fluid layout resizes itself to fill all available space
 /*/	SCREEN.SetFluidLayout = function ( cfg ) {
+		// hide nfo and debug
+		SCREEN.Debug.hide();
+		SCREEN.Info.hide();
 		// resize viewport on browser resize after 250ms
 		$(window).resize(function () {
 			clearTimeout(m_resize_timer);
@@ -210,6 +231,7 @@ define ( [
 		var insetWidth = parseInt(m_root.css('margin-left'))+parseInt(m_root.css('margin-right'));
 		insetWidth += parseInt(m_root.css('padding-left'))+parseInt(m_root.css('padding-right'));
 		displayWidth = displayWidth - insetWidth;
+
 		var insetHeight = parseInt(m_root.css('margin-top'))+parseInt(m_root.css('margin-bottom'));
 		insetHeight += parseInt(m_root.css('padding-top'))+parseInt(m_root.css('padding-bottom'));
 		displayHeight = displayHeight - insetHeight;
@@ -242,6 +264,15 @@ define ( [
 ///////////////////////////////////////////////////////////////////////////////
 /** SCREEN API ***************************************************************/
 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	add screen title to INFO area 
+/*/	SCREEN.SetInfo = function ( htmlstr ) {
+		SCREEN.Info.empty().append(htmlstr);
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.SetDisplayMargin = function ( margin ) {
+		if (Number.isInteger(margin)) margin += 'px';
+	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Utility function to hide scrollbars on the body
 /*/	SCREEN.HideScrollbars = function () {
@@ -282,6 +313,10 @@ define ( [
 			case VIEWPORT.TYPE.MODE_FIXED:
 			case VIEWPORT.TYPE.MODE_SCALED:
 			case VIEWPORT.TYPE.MODE_FLUID:
+				break;
+			case undefined:
+				cfg.mode = VIEWPORT.TYPE.MODE_FIXED;
+				console.warn('SCREEN mode not specified; default to FIXED');
 				break;
 			default:
 				throw "error: "+cfg.mode+" is not a valid mode";
