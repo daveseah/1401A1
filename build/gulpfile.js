@@ -24,6 +24,7 @@
 	var VENDOR      = PUBLIC + 'modules/vendor/';
 	var MODULES     = PUBLIC + 'modules/';
 	var ASSETS      = 'assets/';
+	var SERVER 		= 'server/';
 
 	// for managing the 1401 server node process
 	var spawn 		= require('child_process').spawn;
@@ -35,6 +36,7 @@
 	var LIVERELOAD_PORT = 35729;
 	var tinylr 		= require('tiny-lr')();
 	var config;
+	var restart_timeout;
 
 	// text constants
 	var BP 				= '          ';
@@ -163,16 +165,19 @@
 /*/ Run server
 /*/	gulp.task('server', function () {
 		runServer();
+		startLiveReload();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Run server in debug mode
 /*/	gulp.task('debug', ['build'], function () {
 		runServer({ debug: true });
+		startLiveReload();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Default
 /*/	gulp.task('default', ['build'], function () {
 		runServer();
+		startLiveReload();
 	});
 
 
@@ -188,18 +193,44 @@
 		config.liveReloadPort = config.liveport || LIVERELOAD_PORT;
 		config.debug = config.debug || false;
 
-		console.log(DBGP,'RUNNING IN NODE DEBUG MODE', DBGP);
+		spawnProcess();
 
+		// if changing watch path, make sure to change copy paths in tasks
+		gulp.watch(ASSETS+'modules/**', function ( event ) {
+			runseq (
+				['copy-assets'],
+				function () { notifyLiveReload( event ); }
+			);
+		});
+
+		// handle changes to server files
+		gulp.watch([SERVER+'**/**.js'], function ( event ) {
+			var delay = 3000;
+			kill1401server();
+
+			console.log(DBGP,'SERVER RELOAD IN',delay,'MILLISECONDS...');
+			if (restart_timeout) clearTimeout(restart_timeout);
+			restart_timeout = setTimeout( function() {
+				console.log(DBGP,'SERVER RESTARTING');
+				spawnProcess();
+			}, delay);
+		});
+	}
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ spawn the process based on the stored config parameters
+/*/	function spawnProcess () {
 		var progname = 'node';
 		var args = [];
 		if (config.debug) {
 			progname += '-debug';
 			args.push('--debug-brk=0');
 			args.push('-c');
+			console.log(DBGP,'RUNNING IN NODE DEBUG MODE');
 		}
 		args.push('./server/1401.js');
 		var opt = {
-			env: process.env
+			env: process.env,
+			detached: true
 		};
 
 		// fork the 1401 process
@@ -215,22 +246,11 @@
 		server1401.stdout.pipe(process.stdout);
 		server1401.stderr.pipe(process.stderr);
 
-		// enable livereload features
-		startLiveReload();
-
 		// for gulpfiles that need to do further configuration
 		// to the express app, this hook is provided
 		if (typeof (config.ServerInitHook)==='function') {
 			config.ServerInitHook( app );
 		}
-
-		// if changing watch path, make sure to change copy paths in tasks
-		gulp.watch(ASSETS+'modules/**', function ( event ) {
-			runseq (
-				['copy-assets'],
-				function () { notifyLiveReload( event ); }
-			);
-		});
 	}
 
 
@@ -260,16 +280,18 @@
 
 ///	PROCESS CONTROL ///////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	function Kill1401 () {
+/*/	Kill the running instance of 1401.js
+/*/	function kill1401server () {
 		if (server1401) {
-			server1401.kill();
-			console.log('\n1401 server terminated');
+			process.kill(-server1401.pid);
+			server1401 = null;
+			console.log('\n');
 		}
 	}
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	EXECUTE IMMEDIATELY: On control-c, we need to stop the 1401 webserver
 /*/	process.on('SIGINT', function () {
-		Kill1401();
+		kill1401server();
 		console.log('exiting process...');
 		process.exit();
 	});
