@@ -68,15 +68,27 @@
 		// otherwise, close the server and invoke startExpress()
 		// when the server has completely closed to avoid
 		// EADDRESSINUSE errors
-		app = null;
-		server.close( startExpress ); // startExpress is a callback
+		app = 0;
+		console.log('--- dbg: waiting for server to close...');
+		server.close(function(){
+			console.log('--- dbg: ...server closed, restarting server');
+		 	 startExpress();
+		 }); // startExpress is a callback
+
+		/** this might be returning some invalid reference **/
 	}
 
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ continuing from startServer, startExpress is potentially called async
 	as a callback on liveReload event when the old server is closed.
 /*/	function startExpress () {
-
+		if (app===0) {
+			console.log('*** dbg: startExpress called async from server.close');
+			// was this missing?
+			server = null;
+		} else {
+			console.log('*** dbg: startExpress first time call');
+		}
 		// instantiate express app
 		app = express();
 
@@ -140,6 +152,7 @@
 /*/ Called by gulpfile.js to enable livereload for browser-served files. Note
 	that livereload does NOT restart the Node server.
 /*/	function startLiveReload() {
+		console.log('*** dbg: start livereload');
 		tinylr = require('tiny-lr')();
 		tinylr.listen( config.liveReloadPort, function () {
 			console.log(DP,'Live reload of assets is enabled, (port',
@@ -159,7 +172,12 @@
 			}
 		});
 		console.log(FP,'reload:',fileName);
-		startServer(config);
+
+		// DEBUG TEST SEP-01-2016
+		// commented out startServer because it doesn't work and might be
+		// causing the issues with restarting: see repo issue #6
+		// startServer(config);
+
 	} // notifyLiveReload
 
 
