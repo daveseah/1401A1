@@ -8,6 +8,7 @@
  
 \*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ * //////////////////////////////////////*/
 
+	// modules
 	var gulp        = require('gulp');
 	var bower       = require('gulp-bower');
 	var changed     = require('gulp-changed');
@@ -17,7 +18,7 @@
 	var runseq      = require('run-sequence');
 	var argv  		= require('yargs').argv;
 
-
+	// paths
 	var BOWER       = 'bower_components/';
 	var PUBLIC      = 'public/';
 	var VENDOR      = PUBLIC + 'modules/vendor/';
@@ -28,22 +29,21 @@
 	var fork = require('child_process').fork;
 	var server1401;
 
+	// for handling livereload
+	var LIVERELOAD_PORT = 35729;
+	var tinylr 		= require('tiny-lr')();
+	var config;
 
-///	PROCESS CONTROL ///////////////////////////////////////////////////////////
-/*/	on control-c, we need to stop the 1401 web server also
-/*/	process.on('SIGINT',function() {
-		if (server1401) {
-			server1401.kill();
-			console.log('\n1401 express server terminated');
-		}
-		console.log('exiting process...');
-		process.exit();
-	});
-
+	// text constants
+	var BP 				= '          ';
+	var INFOP 			= '         >';
+	var DP 				= '----------';
+	var NP				= '         !';
+	var FP				= '         *';
+	var ERRP			= '       ERR';
 
 
 ///	GULP TASKS ////////////////////////////////////////////////////////////////
-///	
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Clean-out bower components and public directory
 /*/	gulp.task('clean:all', function () {
@@ -106,7 +106,6 @@
 			// e.g. socket-io, three.min, webrtc-adapter
 		);
 	});
-
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Copy non-framework modules and assets, ignoring Markdown files.
     This includes vendor-extra, which contains non-bower managed libs.
@@ -132,7 +131,6 @@
 			    .pipe(gulp.dest(PUBLIC+'styles'))
 		);
 	});
-
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Example of concatenation (not used)
 /*/	gulp.task('example-concat', function () {
@@ -170,20 +168,73 @@
 	});
 
 
-///	UTILITY FUNCTIONS /////////////////////////////////////////////////////////
-///	
+///	SERVER ////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Start up the server module, passing yargs.argv object, which will be
 	used as a configuration object by startServer
-/*/	function runServer() {
+/*/	function runServer( cfg ) {
+		config = cfg || {};
+		// set default values if not defined
+		config.liveReload = config.liveReload || {};
+		config.liveReload.enabled = config.liveReload.enabled || true;
+		config.liveReloadPort = config.liveport || LIVERELOAD_PORT;
+		
 		// fork the 1401 process
 		server1401 = fork('./server/1401.js');
+		startLiveReload();
+
+		// for gulpfiles that need to do further configuration
+		// to the express app, this hook is provided
+		if (typeof (config.ServerInitHook)==='function') {
+			config.ServerInitHook( app );
+		}
 
 		// if changing watch path, make sure to change copy paths in tasks
 		gulp.watch(ASSETS+'modules/**', function ( event ) {
 			runseq (
 				['copy-assets'],
-				function () { server1401.notifyLiveReload(event); }
+				function () { notifyLiveReload( event ); }
 			);
 		});
 	}
+
+
+///	LIVE RELOAD SUPPORT ///////////////////////////////////////////////////////
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Called by gulpfile.js to enable livereload for browser-served files. Note
+	that livereload does NOT restart the Node server.
+/*/	function startLiveReload() {
+		tinylr.listen( config.liveReloadPort, function () {
+			console.log(DP,'Live reload of assets is enabled, (port',
+				config.liveReloadPort+')',DP);
+		});
+	} 
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Called by gulpfile when a livereload event has been detected.
+/*/	function notifyLiveReload (event) {
+		var fileName = require('path').relative(__dirname, event.path);
+		tinylr.changed({
+			body: {
+				files: [fileName]
+			}
+		});
+		console.log(FP,'reload:',fileName);
+
+	} // notifyLiveReload
+
+
+///	PROCESS CONTROL ///////////////////////////////////////////////////////////
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	function Kill1401 () {
+		if (server1401) {
+			server1401.kill();
+			console.log('\n1401 server terminated');
+		}
+	}
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	EXECUTE IMMEDIATELY: On control-c, we need to stop the 1401 webserver
+/*/	process.on('SIGINT', function () {
+		Kill1401();
+		console.log('exiting process...');
+		process.exit();
+	});
