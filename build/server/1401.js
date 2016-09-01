@@ -197,11 +197,8 @@
 		return server;
 	}
 
+/*/ START /*/
 
-///	EXPORT ////////////////////////////////////////////////////////////////////
-/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	module.exports.startServer 		= startServer;
-	module.exports.startLiveReload 	= startLiveReload;
-	module.exports.notifyLiveReload = notifyLiveReload;
-	module.exports.getServer 		= getServer;
-	module.exports.getExpressApp 	= getExpressApp;
+	console.log('child 1401 process fork');
+	startServer();
+	startLiveReload();

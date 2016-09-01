@@ -17,14 +17,30 @@
 	var runseq      = require('run-sequence');
 	var argv  		= require('yargs').argv;
 
+
 	var BOWER       = 'bower_components/';
 	var PUBLIC      = 'public/';
 	var VENDOR      = PUBLIC + 'modules/vendor/';
 	var MODULES     = PUBLIC + 'modules/';
 	var ASSETS      = 'assets/';
 
-	var server1401  = require('./server/1401.js');
-	var serverInstance;
+	// for managing the 1401 server node process
+	var fork = require('child_process').fork;
+	var server1401;
+
+
+///	PROCESS CONTROL ///////////////////////////////////////////////////////////
+/*/	on control-c, we need to stop the 1401 web server also
+/*/	process.on('SIGINT',function() {
+		if (server1401) {
+			server1401.kill();
+			console.log('\n1401 express server terminated');
+		}
+		console.log('exiting process...');
+		process.exit();
+	});
+
+
 
 ///	GULP TASKS ////////////////////////////////////////////////////////////////
 ///	
@@ -160,11 +176,8 @@
 /*/ Start up the server module, passing yargs.argv object, which will be
 	used as a configuration object by startServer
 /*/	function runServer() {
-		serverInstance = server1401.startServer( argv );
-		server1401.startLiveReload();
-
-		// if you need the express app instance:
-		// var app = server1401.getExpressApp();
+		// fork the 1401 process
+		server1401 = fork('./server/1401.js');
 
 		// if changing watch path, make sure to change copy paths in tasks
 		gulp.watch(ASSETS+'modules/**', function ( event ) {
