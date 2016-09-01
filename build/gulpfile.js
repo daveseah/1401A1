@@ -26,7 +26,9 @@
 	var ASSETS      = 'assets/';
 
 	// for managing the 1401 server node process
-	var fork = require('child_process').fork;
+	var spawn 		= require('child_process').spawn;
+//	var fork 		= require('child_process').fork;
+//	var exec 		= require('child_process').exec;
 	var server1401;
 
 	// for handling livereload
@@ -38,6 +40,7 @@
 	var BP 				= '          ';
 	var INFOP 			= '         >';
 	var DP 				= '----------';
+	var DBGP			= '**********';
 	var NP				= '         !';
 	var FP				= '         *';
 	var ERRP			= '       ERR';
@@ -162,6 +165,11 @@
 		runServer();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Run server in debug mode
+/*/	gulp.task('debug', ['build'], function () {
+		runServer({ debug: true });
+	});
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Default
 /*/	gulp.task('default', ['build'], function () {
 		runServer();
@@ -178,9 +186,36 @@
 		config.liveReload = config.liveReload || {};
 		config.liveReload.enabled = config.liveReload.enabled || true;
 		config.liveReloadPort = config.liveport || LIVERELOAD_PORT;
-		
+		config.debug = config.debug || false;
+
+		console.log(DBGP,'RUNNING IN NODE DEBUG MODE', DBGP);
+
+		var progname = 'node';
+		var args = [];
+		if (config.debug) {
+			progname += '-debug';
+			args.push('--debug-brk=0');
+			args.push('-c');
+		}
+		args.push('./server/1401.js');
+		var opt = {
+			env: process.env
+		};
+
 		// fork the 1401 process
-		server1401 = fork('./server/1401.js');
+		server1401 = spawn( progname, args, opt, 
+			function( err, stdout, stderr ) {
+				console.log('callback from spawn');
+				if (err) console.log(err);
+				if (stdout) console.log(stdout);
+				if (stderr) console.log(stderr);
+			}
+		);
+		// redirect child stdout so we can see it more as it happens
+		server1401.stdout.pipe(process.stdout);
+		server1401.stderr.pipe(process.stderr);
+
+		// enable livereload features
 		startLiveReload();
 
 		// for gulpfiles that need to do further configuration

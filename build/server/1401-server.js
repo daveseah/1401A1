@@ -55,8 +55,8 @@
 		config.isOptimize = false; // was config.isOptimize!==undefined;
 		config.port = config.port || EXPRESS_PORT;
 
+		// actually start the web server
 		startExpress();
-
 	}
 
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
