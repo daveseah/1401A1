@@ -52,7 +52,7 @@ define ( [
 ///////////////////////////////////////////////////////////////////////////////
 /** SYSLOOP API **************************************************************/
 
-	var SCREEN 			= SYSLOOP.New('SCREEN');
+	var SCREEN 			= {};
 		SCREEN.Main 	= null;			// main renderer area
 		SCREEN.Overlay 	= null;			// html over Main
 		SCREEN.CPanel 	= null;			// control panel
@@ -61,7 +61,7 @@ define ( [
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	grab handles to all main elements of the screen.
-/*/	SCREEN.SetHandler( 'Connect', function () {
+/*/	SCREEN.Initialize = function () {
 //		var root = document.getElementById('sys1401');
 		var id = m_root_id;
 		var root = document.getElementById(id);
@@ -100,14 +100,14 @@ define ( [
 		// add info styling
 		SCREEN.Info.css('font-size','smaller');
 
-	});
+	};
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Call during CONSTRUCT phase, so INITIALIZE has had time to run
 /*/	SCREEN.CreateLayout = function ( cfg ) {
-		if (!m_root) {
-			throw "SCREEN.Configure() called before Connect phase complete";
-		}
+
+		if (!m_root) SCREEN.Initialize();
+
 		// check parameters
 		u_NormalizeConfig( cfg );
 
