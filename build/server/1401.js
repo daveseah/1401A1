@@ -7,20 +7,19 @@
 	For unmodified 1401A1 instances, you won't have to change this unless
 	you want to add new features.
 
-	To add new features, create your own version of 1401.js (name 
-	it something else) that does a call to server.setServerInitHook( hook )
-	BEFORE calling startServer(). The hook function will recieve an instance
-	of the express app, which can be modified BEFORE app.listen() is invoked.
-	You can add your own routes, etc, then.
+	To add new features, append additional modules and write a function that
+	initializes them via the server.setServerInitHook() call. This function
+	receives an instance of Express app before app.listen() is called.
 
 \*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ * //////////////////////////////////////*/
 
 	var server = require('./1401-server');
 
-///////////////////////////////////////////////////////////////////////////////
+/// START SERVER //////////////////////////////////////////////////////////////	
 
+	server.setServerInitHook ( function ( app ) {
+		// your additional ExpressJS app initialization goes here
+	});
 	server.startServer();
 
 ///////////////////////////////////////////////////////////////////////////////
-/** RETURN MODULE DEFINITION *************************************************/
-	module.exports.setServerInitHook = server.setServerInitHook;
