@@ -3,12 +3,14 @@ define ([
 	'1401/objects/sysloop',
 	'1401/settings',
 	'1401/system/renderer',
+	'1401/system/screen',
 	'1401/system/visualfactory',
 	'1401/system/piecefactory',
 ], function ( 
 	SYSLOOP,
 	SETTINGS,
 	RENDERER,
+	SCREEN,
 	VISUALFACTORY,
 	PIECEFACTORY
 ) {
@@ -26,6 +28,7 @@ define ([
 	var MOD = SYSLOOP.New("Test03");
 	MOD.EnableUpdate( true );
 
+	MOD.SetHandler( 'Initialize', m_Initialize );
 	MOD.SetHandler( 'Construct', m_Construct );
 	MOD.SetHandler( 'Start', m_Start );
 	MOD.SetHandler( 'Update', m_Update);
@@ -41,6 +44,19 @@ define ([
 ///////////////////////////////////////////////////////////////////////////////
 /** MODULE HANDLER FUNCTIONS *************************************************/
 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	function m_Initialize() {
+		// instead of initializing renderer directly,
+		// use SCREEN which will initialize it for us
+		var cfg = {
+			mode 			: 'fixed',		// 'fixed', 'scaled', or 'fluid'
+			renderWidth 	: 512,			// width of viewport
+			renderHeight 	: 512,			// height of viewport
+			worldUnits 		: 512			// world units visible in viewport
+		};
+		SCREEN.CreateLayout( cfg );
+
+	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Start() {
 		window.DBG_Out( "TEST 003 <b>Infinite Star Scroll Parallax</b>" );

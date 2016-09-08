@@ -5,6 +5,7 @@ define ([
 	'1401/objects/sysloop',
 	'1401/settings',
 	'1401/system/renderer',
+	'1401/system/screen',
 	'1401/system/visualfactory',
 	'1401/system/piecefactory',
 	'1401-games/demo/modules/controls',
@@ -15,6 +16,7 @@ define ([
 	SYSLOOP,
 	SETTINGS,
 	RENDERER,
+	SCREEN,
 	VISUALFACTORY,
 	PIECEFACTORY,
 	SHIPCONTROLS,
@@ -34,8 +36,9 @@ define ([
 ///////////////////////////////////////////////////////////////////////////////
 /** MODULE DECLARATION *******************************************************/
 
-	var MOD = SYSLOOP.New("Test07");
+	var MOD = SYSLOOP.New("Test06");
 
+	MOD.SetHandler( 'Initialize', m_Initialize );
 	MOD.SetHandler( 'Construct', m_Construct );
 	MOD.SetHandler( 'Start', m_Start );
 
@@ -56,6 +59,19 @@ define ([
 ///////////////////////////////////////////////////////////////////////////////
 /** MODULE HANDLER FUNCTIONS *************************************************/
 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	function m_Initialize() {
+		// instead of initializing renderer directly,
+		// use SCREEN which will initialize it for us
+		var cfg = {
+			mode 			: 'fixed',		// 'fixed', 'scaled', or 'fluid'
+			renderWidth 	: 512,			// width of viewport
+			renderHeight 	: 512,			// height of viewport
+			worldUnits 		: 512			// world units visible in viewport
+		};
+		SCREEN.CreateLayout( cfg );
+
+	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Construct() {
 

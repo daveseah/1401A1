@@ -20,7 +20,8 @@ define ([
 //	SYS1401.LocalPath('tests/007-loadassets')
 //	SYS1401.LocalPath('tests/008-timer')
 //	SYS1401.LocalPath('tests/009-ship-bullets')
-	SYS1401.LocalPath('tests/010-screen')
+//	SYS1401.LocalPath('tests/010-screen')
+	SYS1401.LocalPath('tests/011-webrtc-mirror'), 'webrtc-shim',
 ], function ( 
 	DBG,
 	SETTINGS,
@@ -90,16 +91,7 @@ define ([
 /*/	Initialize() happens after Connect() is complete for all SYSLOOP modules.
 /*/	function API_HandleInitialize () {
 
-		// instead of initializing renderer directly,
-		// use SCREEN which will initialize it for us
-		var cfg = {
-			mode 			: 'fluid',		// 'fixed', 'scaled', or 'fluid'
-			renderWidth 	: 768,			// width of viewport
-			renderHeight 	: 768,			// height of viewport
-			worldUnits 		: 768			// world units visible in viewport
-		};
-		SCREEN.CreateLayout( cfg );
-
+		// see TEST module for the initialization routine
 	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

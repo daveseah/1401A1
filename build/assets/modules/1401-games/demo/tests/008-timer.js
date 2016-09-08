@@ -5,6 +5,7 @@ define ([
 	'1401/objects/sysloop',
 	'1401/settings',
 	'1401/system/renderer',
+	'1401/system/screen',
 	'1401/system/visualfactory',
 	'1401/system/piecefactory',
 	'1401-games/demo/modules/controls',	
@@ -15,6 +16,7 @@ define ([
 	SYSLOOP,
 	SETTINGS,
 	RENDERER,
+	SCREEN,
 	VISUALFACTORY,
 	PIECEFACTORY,
 	SHIPCONTROLS,
@@ -24,7 +26,7 @@ define ([
 	var DBGOUT = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-/**	SUBMODULE TEST 005 *******************************************************\
+/**	SUBMODULE TEST 008 *******************************************************\
 
 	This test module exercises the behavior tree system through
 	ai.js.
@@ -32,10 +34,11 @@ define ([
 ///////////////////////////////////////////////////////////////////////////////
 /** MODULE DECLARATION *******************************************************/
 
-	var MOD = SYSLOOP.New("Test03");
+	var MOD = SYSLOOP.New("Test08");
 	MOD.EnableUpdate( true );
 	MOD.EnableInput( true );
 
+	MOD.SetHandler( 'Initialize', m_Initialize );
 	MOD.SetHandler( 'Construct', m_Construct );
 	MOD.SetHandler( 'Start', m_Start );
 	MOD.SetHandler( 'GetInput', m_GetInput);
@@ -61,6 +64,19 @@ define ([
 ///////////////////////////////////////////////////////////////////////////////
 /** MODULE HANDLER FUNCTIONS *************************************************/
 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	function m_Initialize() {
+		// instead of initializing renderer directly,
+		// use SCREEN which will initialize it for us
+		var cfg = {
+			mode 			: 'fixed',		// 'fixed', 'scaled', or 'fluid'
+			renderWidth 	: 512,			// width of viewport
+			renderHeight 	: 512,			// height of viewport
+			worldUnits 		: 512			// world units visible in viewport
+		};
+		SCREEN.CreateLayout( cfg );
+
+	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Construct() {
 		console.log("*** ALLOCATING",num_timers,"TIMERS");
