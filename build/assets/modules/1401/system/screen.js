@@ -44,7 +44,7 @@ define ( [
 
 	var m_root_id 		= 'display';	// id of parent div
 	var m_renderer_id	= 'renderer';	// id of renderer div
-	var m_root 			= null;			// jquery object for root
+	var m_root 			= null;			// jquery obj (also in SCREEN.Root)
 	var m_cfg 			= null;			// remember configuration
 	var m_resize_timer	= null;			// screen resizing delay
 
@@ -53,6 +53,7 @@ define ( [
 /** SYSLOOP API **************************************************************/
 
 	var SCREEN 			= {};
+		SCREEN.Root 	= null;
 		SCREEN.Main 	= null;			// main renderer area
 		SCREEN.Overlay 	= null;			// html over Main
 		SCREEN.CPanel 	= null;			// control panel
@@ -79,6 +80,7 @@ define ( [
 		root.append( '<div id="'+m_renderer_id+'"></div>' );
 		root.append( '<div id="dbg1401"></div>' );
 		// save references
+		SCREEN.Root 	= m_root;
 		SCREEN.Main 	= $( '#'+m_renderer_id );
 		SCREEN.Info 	= $( '#nfo1401' );
 		SCREEN.Debug 	= $( '#dbg1401' );
@@ -99,9 +101,20 @@ define ( [
 		SCREEN.Debug.css('background-color','rgba(192,192,192,0.5)');
 		// add info styling
 		SCREEN.Info.css('font-size','smaller');
-
 	};
 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.DBG_Append = function ( htmlstr ) {
+		SCREEN.Root.append(htmlstr);
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.DBG_Prepend = function ( htmlstr ) {
+		SCREEN.Root.prepend(htmlstr);
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.DBG_GetWebGLCanvas = function () {
+		return RENDERER.Viewport().WebGLCanvas();
+	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Call during CONSTRUCT phase, so INITIALIZE has had time to run
 /*/	SCREEN.CreateLayout = function ( cfg ) {

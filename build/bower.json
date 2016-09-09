@@ -1,15 +1,15 @@
 {
-	"name":	"engine-1401a1",
-	"version": "1.0.0",
-	"dependencies": {
-		"durandal": "2.1.0",
-		"bootstrap": "3.3.6",
-		"components-font-awesome": "4.5.0",
-	    "yaml.js": "0.2.6",
-	    "Keypress": "2.1.3",
-	    "howler": "~1.1.29",
-	    "physicsjs": "~0.7.0"
-	},
-	"devDependencies": {
-	}
+  "name": "engine-1401a1",
+  "version": "1.0.0",
+  "dependencies": {
+    "durandal": "2.1.0",
+    "bootstrap": "3.3.6",
+    "components-font-awesome": "4.5.0",
+    "yaml.js": "0.2.6",
+    "Keypress": "2.1.3",
+    "howler": "~1.1.29",
+    "physicsjs": "~0.7.0",
+    "webrtc-adapter": "^2.0.3"
+  },
+  "devDependencies": {}
 }
