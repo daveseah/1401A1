@@ -17,8 +17,10 @@
 	var errorHandler 	= require('errorhandler');
 	var ip 				= require('ip');
 
+	// 1401 livereload manager
+	var LR 				= require('./1401-livereload');
+
 	// allocate 
-	var tinylr;			// set by startLiveReload
 	var app; 			// set by startServer
 	var server;			// set by startServer
 	var config; 		// save configuration object from startServer()
@@ -41,18 +43,18 @@
 	var FP				= '         *';
 	var ERRP			= '       ERR';
 
+
 ///////////////////////////////////////////////////////////////////////////////
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ config is an object. It will be created if it doesn't exist. This is called
-	by gulpfile.js's runServer() function, which passes a yargs.argv object that
-	should be compatible with this code.
+/*/ The configuration object cfg can be passed to override the listed
+	parameters. Since 1401-server is spawned by 1401 as a separate 
+	process, configuration can't be passed directly from gulpfile. 
 /*/	function startServer ( cfg ) {
 
 		// initialize config from either passed value or as new object
 		// save as module-wide object
 		config = cfg || {};
 		// force optimize false always to use requirejs
-		config.isOptimize = false; // was config.isOptimize!==undefined;
 		config.port = config.port || EXPRESS_PORT;
 
 		// actually start the web server
@@ -60,8 +62,10 @@
 	}
 
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ continuing from startServer, startExpress is potentially called async
-	as a callback on liveReload event when the old server is closed.
+/*/ Continuing from startServer, set up Express routing. The app instance is
+	passed back to a callback that is defined before startServer() is called,
+	which is useful for overriding the default 1401.js behavior. Again,
+	this is not setable from the gulpfile.
 /*/	function startExpress () {
 		// instantiate express app
 		app = express();
@@ -91,13 +95,14 @@
 		// routes are relative to compiledDir
 		var router = express.Router();
 		router.get('/', function(req, res) {
-			var fullURL = req.protocol+"://";
-			fullURL += req.hostname+':'+config.liveReloadPort;
-			fullURL += '/livereload.js';
+			var lrcfg = LR.getDefaultParameters();
+			var livereloadUrl = req.protocol+"://";
+			livereloadUrl += req.hostname+':'+lrcfg.liveReloadPort;
+			livereloadUrl += '/livereload.js';
 			res.render('index', {
-				reload: 	config.liveReload,
-				optimize:  	config.isOptimize,
-				reloadjs: 	fullURL
+				reload: 	lrcfg.liveReload,
+				optimize:  	false,
+				reloadjs: 	livereloadUrl
 			});
 		});
 		app.use('/', router);
@@ -111,15 +116,14 @@
 		// start it up
 		server = app.listen(app.get('port'), function() {
 			console.log(DP,'VISIT ONE OF THESE URLS in CHROME WEB BROWSER',DP);
-			console.log(BP,'LOCAL ... http://localhost:'+app.get('port'));
-			console.log(BP,'LAN ..... http://'+ip.address()+':'+app.get('port'));
+			console.log(BP,'LOCAL - http://localhost:'+app.get('port'));
+			console.log(BP,'LAN   - http://'+ip.address()+':'+app.get('port'));
 		});
 
 		// server is an instance of http.Server
 		return server;
 
 	} // startServer 
-
 
 
 
