@@ -18,10 +18,10 @@ The 1401 Game System is built around the idea of **pieces** that have **visuals*
 
 This system is a work-in-progress, so the architecture and features are subject to change. 
 
-#### ADDING TO DURANDAL
+#### EXAMPLE: ADDING A NEW SUBAPP
 
-For purposes of this document, let's say you're adding a new game tab for 'Pickles'. Follow these instructions:
+Let's say you're adding a new game tab for 'Pickles'. Follow these instructions:
 
 * Duplicate `1401-games/_blank` as your new game (e.g. 1401-games/pickles)
-* In `app/shell.js`, add a route definition. The route is `pickles`, and the moduleId is `1401-games/pickles/game-init`
+* In `app/shell.js`, add a route definition. The route is `pickles`, and the moduleId is `1401-games/pickles/game-run`
 * Run the app by typing `gulp clean:all; gulp` and navigate to `http://localhost:3000#pickles` to see the app
