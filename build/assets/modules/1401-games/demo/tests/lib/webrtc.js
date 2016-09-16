@@ -1,187 +1,195 @@
 /* test/lib/webrtc */
 define ( [
-	'1401/settings',
-	'1401/system/screen'
+  '1401/settings',
+  '1401/system/screen'
 ], function (
-	SETTINGS,
-	SCREEN
+  SETTINGS,
+  SCREEN
 ){
 
 ///////////////////////////////////////////////////////////////////////////////
-/**	MODULE *******************************************************************\
+/** WEBRTC MIRRORING DEMO ****************************************************\
 
-	Description of MODULE
-	
-///////////////////////////////////////////////////////////////////////////////
-/** PRIVATE MODULE VARIABLES *************************************************/
+  This is a rewritten and clarified version of: 
+  https://webrtc.github.io/samples/src/content/capture/canvas-pc/
 
-	var m_pieces = [];
 
 /** PUBLIC API ***************************************************************/
 
-	var WEBRTC = {};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	WEBRTC.Initialize = function () {
-		console.log('*** WEBRTC INIT ***');
-	};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	WEBRTC.Construct = function () {
-		console.log('*** WEBRTC CONSTRUCT ***');
-		SCREEN.DBG_Append('<video id="video" style="float:left;" autoplay></video>');
-	};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	WEBRTC.Start = function () {
-		console.log('*** WEBRTC START ***');
-		var vid = document.getElementById('video');
+  var WEBRTC = {};
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  WEBRTC.Initialize = function () {
+    console.log('*** WEBRTC INIT ***');
+  };
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  WEBRTC.Construct = function () {
+    console.log('*** WEBRTC CONSTRUCT ***');
+    SCREEN.DBG_Append('<video id="webgl_mirror" style="float:left;" autoplay></video>');
+  };
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Implements a peer-to-peer connection between a source (taken from
+  the WebGL canvas via canvas.captureScreen() method) and a remote peer
+  connection (video element). This code works though only because it doesn't
+  implement a remote webapp, relying on closures. However, this cleaned-up
+  example shows the flow of connection creation; a way of conveying the
+  remote peer connection stuff over the network will make this actually
+  useful.
+/*/ WEBRTC.Start = function () {
 
-		vid.addEventListener('loadedmetadata', function() {
-		  console.log('Remote video videoWidth: ' + this.videoWidth +
-		    'px,  videoHeight: ' + this.videoHeight + 'px');
-		});
+    // CANVAS MIRROR VIDEO ELEMENT SETUP ////////////////////////////////
 
-		vid.onresize = function() {
-		  console.log('Remote video size changed to ' +
-		    vid.videoWidth + 'x' + vid.videoHeight);
-		};
+    var videoElement = document.getElementById('webgl_mirror');
+    videoElement.addEventListener('loadedmetadata', function() {
+      console.log('Remote video videoWidth: ' + this.videoWidth +
+        'px,  videoHeight: ' + this.videoHeight + 'px');
+    });
+    videoElement.onresize = function() {
+      console.log('Remote video size changed to ' +
+        videoElement.videoWidth + 'x' + videoElement.videoHeight);
+    };
 
-		var glc = SCREEN.DBG_GetWebGLCanvas();
-		var stream = glc.captureStream();
 
-		var videoTracks = stream.getVideoTracks();
-		if (videoTracks.length > 0) {
-			console.log('Using video device: ' + videoTracks[0].label);
-		}
+    // GET MEDIASTREAM SOURCE FROM WEBGL ////////////////////////////////
 
-		var servers = null;
-		var pc1;
-		var pc2;
-		var offerOptions = {
-		  offerToReceiveAudio: 1,
-		  offerToReceiveVideo: 1
-		};
+    var glc   = SCREEN.DBG_GetWebGLCanvas();
+    var stream  = glc.captureStream();
 
-		  pc1 = new RTCPeerConnection(servers);
-		  console.log('Created local peer connection object pc1');
-		  pc1.onicecandidate = function(e) {
-		    onIceCandidate(pc1, e);
-		  };
-		  pc2 = new RTCPeerConnection(servers);
-		  console.log('Created remote peer connection object pc2');
-		  pc2.onicecandidate = function(e) {
-		    onIceCandidate(pc2, e);
-		  };
-		  pc1.oniceconnectionstatechange = function(e) {
-		    onIceStateChange(pc1, e);
-		  };
-		  pc2.oniceconnectionstatechange = function(e) {
-		    onIceStateChange(pc2, e);
-		  };
-		  pc2.onaddstream = gotRemoteStream;
+    var videoTracks = stream.getVideoTracks();
+    if (videoTracks.length > 0) {
+      console.log('Using video device: ' + videoTracks[0].label);
+    }
 
-		  pc1.addStream(stream);
-		  console.log('Added local stream to pc1');
 
-		  console.log('pc1 createOffer start');
-		  pc1.createOffer(onCreateOfferSuccess, onCreateSessionDescriptionError,
-		      offerOptions);
+    // WEBRTC SETUP /////////////////////////////////////////////////////
 
-		function onCreateSessionDescriptionError(error) {
-		  console.log('Failed to create session description: ' + error.toString());
-		}
+    // create source peer connections (pconn)
+    var rtc_config_opts = null;
+    var pc_src = new RTCPeerConnection( rtc_config_opts );
+    var pc_rec = new RTCPeerConnection( rtc_config_opts );
 
-		function onCreateOfferSuccess(desc) {
-		  console.log('Offer from pc1\n' + desc.sdp);
-		  console.log('pc1 setLocalDescription start');
-		  pc1.setLocalDescription(desc, function() {
-		    onSetLocalSuccess(pc1);
-		  }, onSetSessionDescriptionError);
-		  console.log('pc2 setRemoteDescription start');
-		  pc2.setRemoteDescription(desc, function() {
-		    onSetRemoteSuccess(pc2);
-		  }, onSetSessionDescriptionError);
-		  console.log('pc2 createAnswer start');
-		  // Since the 'remote' side has no media stream we need
-		  // to pass in the right constraints in order for it to
-		  // accept the incoming offer of audio and video.
-		  pc2.createAnswer(onCreateAnswerSuccess, onCreateSessionDescriptionError);
-		}
+    // ensure that when one pconn gets a candidate connection
+    // server, the other one knows about it too
+    pc_src.onicecandidate = function(e) {
+      ShareIceCandidate(pc_src, e);
+    };
+    pc_rec.onicecandidate = function(e) {
+      ShareIceCandidate(pc_rec, e);
+    };
 
-		function onSetLocalSuccess(pc) {
-		  console.log(getName(pc) + ' setLocalDescription complete');
-		}
+    // provide diagnostic information about 
+    // connection state changes
+    pc_src.oniceconnectionstatechange = function(e) {
+      PrintIceStateChangeInfo(pc_src, e);
+    };
+    pc_rec.oniceconnectionstatechange = function(e) {
+      PrintIceStateChangeInfo(pc_rec, e);
+    };
 
-		function onSetRemoteSuccess(pc) {
-		  console.log(getName(pc) + ' setRemoteDescription complete');
-		}
+    // set handler for when a stream becomes available
+    // to attach to a video object
+    pc_rec.onaddstream = function ( e ) {
+      videoElement.srcObject = e.stream;
+      console.log('pc_rec received remote stream');
+    };
 
-		function onSetSessionDescriptionError(error) {
-		  console.log('Failed to set session description: ' + error.toString());
-		}
+    // add the active stream to the source peer connection
+    // so it's ready to send data when connection is made!
+    pc_src.addStream(stream);
 
-		function gotRemoteStream(e) {
-		  video.srcObject = e.stream;
-		  console.log('pc2 received remote stream');
-		}
+    // specify offer options before making the offer
+    var offerOptions = {
+      offerToReceiveAudio: 1,
+      offerToReceiveVideo: 1
+    };
 
-		function onCreateAnswerSuccess(desc) {
-		  console.log('Answer from pc2:\n' + desc.sdp);
-		  console.log('pc2 setLocalDescription start');
-		  pc2.setLocalDescription(desc, function() {
-		    onSetLocalSuccess(pc2);
-		  }, onSetSessionDescriptionError);
-		  console.log('pc1 setRemoteDescription start');
-		  pc1.setRemoteDescription(desc, function() {
-		    onSetRemoteSuccess(pc1);
-		  }, onSetSessionDescriptionError);
-		}
+    // make the offer to remote, which will respond with an answer
+    // NOTE: createOffer() and createAnswer() return a Promise
+    pc_src.createOffer( offerOptions )
+      .then( function( offer ) {
+        console.log('Offer from pc_src\n' + offer.sdp);
+        console.log('pc_src setLocalDescription start');
+        /*NOTE*DEPRECATED SYNTAX*/
+        pc_src.setLocalDescription( 
+          offer,
+          function(){PrintSessionSuccess(pc_rec);},
+          PrintSessionError
+        );
 
-		function onIceCandidate(pc, event) {
-		  if (event.candidate) {
-		    getOtherPc(pc).addIceCandidate(new RTCIceCandidate(event.candidate),
-		        function() {
-		          onAddIceCandidateSuccess(pc);
-		        },
-		        function(err) {
-		          onAddIceCandidateError(pc, err);
-		        }
-		    );
-		    console.log(getName(pc) + ' ICE candidate: \n' + event.candidate.candidate);
-		  }
-		}
+       console.log('pc_rec setRemoteDescription start');
+        /*NOTE*DEPRECATED SYNTAX*/
+        pc_rec.setRemoteDescription(
+          offer, 
+          function(){PrintSessionSuccess(pc_rec);},
+          PrintSessionError
+        );
 
-		function onAddIceCandidateSuccess(pc) {
-		  console.log(getName(pc) + ' addIceCandidate success');
-		}
+        console.log('pc_rec createAnswer start');
+        // Since the 'remote' side has no media stream we need
+        // to pass in the right constraints in order for it to
+        // accept the incoming offer of audio and video.
+        pc_rec.createAnswer()
+          .then(function(answer) {
+            console.log('Answer from pc_rec:\n' + answer.sdp);
+            console.log('pc_rec setLocalDescription start');
+            pc_rec.setLocalDescription(
+              answer, 
+              function(){PrintSessionSuccess(pc_rec);},
+              PrintSessionError
+            );
 
-		function onAddIceCandidateError(pc, error) {
-		  console.log(getName(pc) + ' failed to add ICE Candidate: ' + error.toString());
-		}
+            console.log('pc_src setRemoteDescription start');
+            pc_src.setRemoteDescription(
+              answer, 
+              function(){PrintSessionSuccess(pc_rec);},
+              PrintSessionError
+            );
+          });
+      }).catch( function (error) { 
+        console.log('failed to create session description');
+      });
 
-		function onIceStateChange(pc, event) {
-		  if (pc) {
-		    console.log(getName(pc) + ' ICE state: ' + pc.iceConnectionState);
-		    console.log('ICE state change event: ', event);
-		  }
-		}
+  //  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function PrintSessionSuccess(pc) {
+      console.log(u_GetName(pc) + ' setRemoteDescription complete');
+    }
+  //  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function PrintSessionError(error) {
+      console.log('Failed to set session description: ' + error.toString());
+    }
+  //  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function ShareIceCandidate(pc, event) {
+      if (event.candidate) {
+        u_GetOtherPc(pc).addIceCandidate(new RTCIceCandidate(event.candidate),
+            function() {
+              console.log(u_GetName(pc) + ' addIceCandidate success');
+            },
+            function(error) {
+              console.log(u_GetName(pc) + ' failed to add ICE Candidate: ' + error.toString());
+            }
+        );
+        console.log(u_GetName(pc) + ' ICE candidate: \n' + event.candidate.candidate);
+      }
+    }
+  //  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function PrintIceStateChangeInfo(pc, event) {
+      if (pc) {
+        console.log(u_GetName(pc) + ' ICE state: ' + pc.iceConnectionState);
+        console.log('ICE state change event: ', event);
+      }
+    }
+  //  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function u_GetName(pc) {
+      return (pc === pc_src) ? 'pc_src' : 'pc_rec';
+    }
+  /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function u_GetOtherPc(pc) {
+      return (pc === pc_src) ? pc_rec : pc_src;
+    }
+  };
 
-		function getName(pc) {
-		  return (pc === pc1) ? 'pc1' : 'pc2';
-		}
-
-		function getOtherPc(pc) {
-		  return (pc === pc1) ? pc2 : pc1;
-		}
-
-	};
-
-///////////////////////////////////////////////////////////////////////////////
-/** PRIVATE MODULE FUNCTIONS *************************************************/
-
-	function m_PrivateFunction () {
-	}
 
 ///////////////////////////////////////////////////////////////////////////////
 /** RETURN MODULE ************************************************************/
-	return WEBRTC;
+  return WEBRTC;
 
 });
