@@ -1,1 +1,1 @@
-The `javascripts` folder contains browser-side scripts, organized by function. The `app` folder, for example, contains Durandal WebApp files, and the `1401` folder contains the game system core files.
+The `mmodules` folder contains browser-side javascripts, organized as system-level components. The `app` folder, for example, contains Durandal WebApp files, and the `1401` folder contains the game system core files.

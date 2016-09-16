@@ -28,14 +28,10 @@
 
 	// for managing the 1401 server node process
 	var spawn 		= require('child_process').spawn;
-//	var fork 		= require('child_process').fork;
-//	var exec 		= require('child_process').exec;
 	var server1401;
 
 	// for handling livereload
-	var LIVERELOAD_PORT = 35729;
-	var tinylr 		= require('tiny-lr')();
-	var config;
+	var LR 			= require('./server/1401-livereload');
 	var restart_timeout;
 
 	// text constants
@@ -167,19 +163,16 @@
 /*/ Run server
 /*/	gulp.task('server', function () {
 		runServer();
-		startLiveReload();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Run server in debug mode
 /*/	gulp.task('debug', ['build'], function () {
 		runServer({ debug: true });
-		startLiveReload();
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Default
 /*/	gulp.task('default', ['build'], function () {
 		runServer();
-		startLiveReload();
 	});
 
 
@@ -188,46 +181,50 @@
 /*/ Start up the server module, passing yargs.argv object, which will be
 	used as a configuration object by startServer
 /*/	function runServer( cfg ) {
+		// debug flag will spawn server with node-inspector
 		config = cfg || {};
-		// set default values if not defined
-		config.liveReload = config.liveReload || {};
-		config.liveReload.enabled = config.liveReload.enabled || true;
-		config.liveReloadPort = config.liveport || LIVERELOAD_PORT;
 		config.debug = config.debug || false;
 
-		spawnProcess();
+		// spawn livereload configuration
+		LR.startLiveReload( config );
+		// spawn the process!
+		spawnProcess( config );
 
-		// if changing watch path, make sure to change copy paths in tasks
+		// If changing watch path, make sure to change copy paths in tasks
+		// Requires LiveReload browser extension installed in browser
+		// and it must enabled AND connected.
 		gulp.watch(ASSETS+'modules/**', function ( event ) {
 			runseq (
 				['copy-assets'],
-				function () { notifyLiveReload( event ); }
+				function () { LR.notifyLiveReload( event ); }
 			);
 		});
 
 		// handle changes to server files
-		gulp.watch([SERVER+'**/**.js'], function ( event ) {
-			var delay = 3000;
+		gulp.watch([SERVER+'**/**.js',SERVER+'**/**.hbs'], function ( event ) {
+			var delay = 1500;
 			kill1401server();
-
-			console.log(DBGP,'SERVER RELOAD IN',delay,'MILLISECONDS...');
+			console.log(DBGP,'SERVER  reload in',delay,'ms...');
 			if (restart_timeout) clearTimeout(restart_timeout);
 			restart_timeout = setTimeout( function() {
-				console.log(DBGP,'SERVER RESTARTING');
 				spawnProcess();
+				console.log(DBGP,'BROWSER reload in',delay,'ms...');
+				setTimeout( function () {
+					LR.reloadAll();
+				}, delay);
 			}, delay);
 		});
 	}
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ spawn the process based on the stored config parameters
-/*/	function spawnProcess () {
+/*/	function spawnProcess ( cfg ) {
 		var progname = 'node';
 		var args = [];
 		if (config.debug) {
 			progname += '-debug';
 			args.push('--debug-brk=0');
 			args.push('-c');
-			console.log(DBGP,'RUNNING IN NODE DEBUG MODE');
+			console.log( DBGP,'RUNNING IN NODE DEBUG MODE' );
 		}
 		args.push('./server/1401.js');
 		var opt = {
@@ -247,37 +244,8 @@
 		// redirect child stdout so we can see it more as it happens
 		server1401.stdout.pipe(process.stdout);
 		server1401.stderr.pipe(process.stderr);
-
-		// for gulpfiles that need to do further configuration
-		// to the express app, this hook is provided
-		if (typeof (config.ServerInitHook)==='function') {
-			config.ServerInitHook( app );
-		}
 	}
 
-
-///	LIVE RELOAD SUPPORT ///////////////////////////////////////////////////////
-/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ Called by gulpfile.js to enable livereload for browser-served files. Note
-	that livereload does NOT restart the Node server.
-/*/	function startLiveReload() {
-		tinylr.listen( config.liveReloadPort, function () {
-			console.log(DP,'Live reload of assets is enabled, (port',
-				config.liveReloadPort+')',DP);
-		});
-	} 
-/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ Called by gulpfile when a livereload event has been detected.
-/*/	function notifyLiveReload (event) {
-		var fileName = require('path').relative(__dirname, event.path);
-		tinylr.changed({
-			body: {
-				files: [fileName]
-			}
-		});
-		console.log(FP,'reload:',fileName);
-
-	} // notifyLiveReload
 
 
 ///	PROCESS CONTROL ///////////////////////////////////////////////////////////
