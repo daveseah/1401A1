@@ -70,6 +70,24 @@ if (window.SYS1401) {
     SYS1401.LocalPath = function ( moduleName ) {
         throw "SYS1401.LocalPath() was called before MASTER.Start()";
     };
+    // EnableRunSelection() is called before master.js in the _appshell.js
+    // file; this is a way to remind programmers that they need to add the
+    // MOD.activate Durandal binding to capture queries
+    SYS1401.queryEnabled = false;
+    SYS1401.EnableRunSelection = function ( query ) {
+        SYS1401.queryEnabled = true;
+        SYS1401.query = query || {};        
+    };
+    // path utility to grab ?run=relative/path/to/module from URL
+    // so it can be used as argument in a LocalPath() call
+    SYS1401.SelectRun = function ( def ) {
+        if (SYS1401.queryEnabled) {
+            SYS1401.query.run = SYS1401.query.run || def;
+            return SYS1401.query.run;
+        } else {
+            console.error("_appshell.js must define .activate(query) that calls SYS1401.EnableRunSelection(query) to use run selection!");
+        }
+    };
 
 
 /// START DURANDAL CONFIGURATION //////////////////////////////////////////////

@@ -30,6 +30,9 @@ define ([
 	MOD.displayName = 'Game Demo';
 	MOD.description = 'Game system testing code';
 
+	MOD.activate = function ( query ) {
+		SYS1401.EnableRunSelection( query );
+	};
 	MOD.compositionComplete = function () {
 		MASTER.Start( this );
 	};
