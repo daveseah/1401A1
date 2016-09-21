@@ -24,7 +24,7 @@ define ( [
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   WEBRTC.Construct = function () {
     console.log('*** WEBRTC CONSTRUCT ***');
-    SCREEN.DBG_Append('<video id="webgl_mirror" style="float:left;" autoplay></video>');
+    SCREEN.RootAppend('<video id="webgl_mirror" style="float:left;" autoplay></video>');
   };
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Implements a peer-to-peer connection between a source (taken from
@@ -51,7 +51,7 @@ define ( [
 
     // GET MEDIASTREAM SOURCE FROM WEBGL ////////////////////////////////
 
-    var glc   = SCREEN.DBG_GetWebGLCanvas();
+    var glc   = SCREEN.WebGLCanvas();
     var stream  = glc.captureStream();
 
     var videoTracks = stream.getVideoTracks();

@@ -104,15 +104,15 @@ define ( [
 	};
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.DBG_Append = function ( htmlstr ) {
+	SCREEN.RootAppend = function ( htmlstr ) {
 		SCREEN.Root.append(htmlstr);
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.DBG_Prepend = function ( htmlstr ) {
+	SCREEN.RootPrepend = function ( htmlstr ) {
 		SCREEN.Root.prepend(htmlstr);
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.DBG_GetWebGLCanvas = function () {
+	SCREEN.WebGLCanvas = function () {
 		return RENDERER.Viewport().WebGLCanvas();
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
