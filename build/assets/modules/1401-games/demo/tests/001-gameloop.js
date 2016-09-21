@@ -3,12 +3,14 @@ define ([
 	'1401/objects/sysloop',
 	'1401/settings',
 	'1401/system/renderer',
+	'1401/system/screen',
 	'1401/system/visualfactory',
 	'1401/system/piecefactory',
 ], function ( 
 	SYSLOOP,
 	SETTINGS,
 	RENDERER,
+	SCREEN,
 	VISUALFACTORY,
 	PIECEFACTORY
 ) {
@@ -74,6 +76,17 @@ define ([
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Initialize() {
+		// instead of initializing renderer directly,
+		// use SCREEN which will initialize it for us
+		var cfg = {
+			mode 			: 'fixed',		// 'fixed', 'scaled', or 'fluid'
+			renderWidth 	: 768,			// width of viewport
+			renderHeight 	: 768,			// height of viewport
+			worldUnits 		: 768			// world units visible in viewport
+		};
+		SCREEN.CreateLayout( cfg );
+
+		// update the background
 		var bg_png = SETTINGS.AssetPath('resources/bg.png');
 		RENDERER.SetBackgroundImage ( bg_png );
 	}

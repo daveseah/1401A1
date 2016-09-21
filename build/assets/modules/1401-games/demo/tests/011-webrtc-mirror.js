@@ -1,4 +1,4 @@
-/* demo/test/009-ship-controls.js */
+/* demo/test/011-webrtc-mirror.js */
 define ([
 	'keypress',
 	'physicsjs',
@@ -9,7 +9,8 @@ define ([
 	'1401/system/screen',
 	'1401/system/visualfactory',
 	'1401/system/piecefactory',
-	'1401-games/demo/modules/controls'
+	'1401-games/demo/modules/controls',
+	SYS1401.LocalPath('tests/lib/webrtc')
 ], function ( 
 	KEY,
 	PHYSICS,
@@ -20,20 +21,25 @@ define ([
 	SCREEN,
 	VISUALFACTORY,
 	PIECEFACTORY,
-	SHIPCONTROLS
+	SHIPCONTROLS,
+	WEBRTC
 ) {
 
 	var DBGOUT = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-/**	SUBMODULE TEST 009 *******************************************************\
+/**	SUBMODULE TEST 011 *******************************************************\
+	source codebase: TEST 010
+	
+	WebRTC mirroring. Can we grab the WebGL canvas and stream it to a video
+	destination on the same page? If we can do that, can we stream it to
+	another webpage?
 
-	Based on 004, add BULLETS THAT MOVE!
 
 ///////////////////////////////////////////////////////////////////////////////
 /** MODULE DECLARATION *******************************************************/
 
-	var MOD = SYSLOOP.New("Test09");
+	var MOD = SYSLOOP.New("Test11");
 
 	MOD.EnableUpdate( true );
 	MOD.EnableInput( true );
@@ -65,18 +71,21 @@ define ([
 		// use SCREEN which will initialize it for us
 		var cfg = {
 			mode 			: 'fixed',		// 'fixed', 'scaled', or 'fluid'
-			renderWidth 	: 768,			// width of viewport
-			renderHeight 	: 768,			// height of viewport
-			worldUnits 		: 768			// world units visible in viewport
+			renderWidth 	: 256,			// width of viewport
+			renderHeight 	: 256,			// height of viewport
+			worldUnits 		: 256			// world units visible in viewport
 		};
 		SCREEN.CreateLayout( cfg );
 
+		// invoke webrtc feature testing init
+		WEBRTC.Initialize();
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Construct() {
 
 			var i, platform;
 
+			RENDERER.SelectWorld3D();
 			var cam = RENDERER.Viewport().WorldCam3D();
 			var z = cam.position.z;
 			var fog = new THREE.Fog(0x000000,z-100,z+50);
@@ -204,6 +213,9 @@ define ([
 				urls: [sfx]
 			});
 
+		// test WebRTC stuff here
+		WEBRTC.Construct();
+
 	}
 
 ///	HEAP-SAVING PRE-ALLOCATED VARIABLES /////////////////////////////////////
@@ -213,12 +225,13 @@ define ([
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function m_Start() {
-		RENDERER.SelectWorld3D();
 		SHIPCONTROLS.BindKeys();
 
-		window.DBG_Out( "TEST 09 <b>Bullets!</b>" );
-		window.DBG_Out( "<tt>game-main include: 1401-games/demo/tests/009</tt>" );
-		window.DBG_Out( "Use WASDQE to move. SPACE brakes. C fires." );
+		window.DBG_Out( "TEST 11 <b>WEBRTC STREAM TESTS</b>" );
+		window.DBG_Out( "<tt>game-main include: 1401-games/demo/tests/011</tt>" );
+
+		// test WebRTC stuff here
+		WEBRTC.Start();
 	}	
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

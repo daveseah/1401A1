@@ -86,7 +86,9 @@
 			gulp.src(BOWER+'requirejs/require.js').pipe(gulp.dest(VENDOR+'require')),
 			gulp.src(BOWER+'requirejs-text/text.js').pipe(gulp.dest(VENDOR+'require')),
 			// copy knockout
-			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VENDOR+'knockout'))
+			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VENDOR+'knockout')),
+			/* copy webrtc */
+			gulp.src(BOWER+'webrtc-adapter/release/adapter.js').pipe(gulp.dest(VENDOR+'webrtc-adapter'))
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

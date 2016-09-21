@@ -1,9 +1,10 @@
+// add additional special modules used by this game //
 SYS1401.AddModulePath( 'keypress', 'vendor/Keypress/keypress-2.1.3.min' );
 SYS1401.AddModulePath( 'howler', 'vendor/howler/howler' );
 SYS1401.AddModulePath( 'webrtc-shim', 'vendor/webrtc-adapter/adapter' );
 SYS1401.AddModulePath( 'socket-io', 'vendor-extra/socket.io' );
-
 SYS1401.UpdateModulePaths();
+
 define ([
 	'1401/system/debug',
 	'1401/settings',
@@ -20,8 +21,8 @@ define ([
 //	SYS1401.LocalPath('tests/007-loadassets')
 //	SYS1401.LocalPath('tests/008-timer')
 //	SYS1401.LocalPath('tests/009-ship-bullets')
-//	SYS1401.LocalPath('tests/010-screen')
-	SYS1401.LocalPath(SYS1401.SelectRun('tests/001-gameloop'))
+	SYS1401.LocalPath('tests/010-screen')
+//	SYS1401.LocalPath('tests/011-webrtc-mirror'), 'webrtc-shim',
 ], function ( 
 	DBG,
 	SETTINGS,
@@ -91,16 +92,7 @@ define ([
 /*/	Initialize() happens after Connect() is complete for all SYSLOOP modules.
 /*/	function API_HandleInitialize () {
 
-		// instead of initializing renderer directly,
-		// use SCREEN which will initialize it for us
-		var cfg = {
-			mode 			: 'fluid',		// 'fixed', 'scaled', or 'fluid'
-			renderWidth 	: 768,			// width of viewport
-			renderHeight 	: 768,			// height of viewport
-			worldUnits 		: 768			// world units visible in viewport
-		};
-		SCREEN.CreateLayout( cfg );
-
+		// see TEST module for the initialization routine
 	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
