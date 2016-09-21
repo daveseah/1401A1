@@ -20,7 +20,8 @@ define ([
 //	SYS1401.LocalPath('tests/007-loadassets')
 //	SYS1401.LocalPath('tests/008-timer')
 //	SYS1401.LocalPath('tests/009-ship-bullets')
-	SYS1401.LocalPath('tests/010-screen')
+//	SYS1401.LocalPath('tests/010-screen')
+	SYS1401.LocalPath(SYS1401.SelectRun('tests/001-gameloop'))
 ], function ( 
 	DBG,
 	SETTINGS,

@@ -79,6 +79,13 @@ define ([
 		    if (!moduleId.endsWith('.js')) moduleId += '.js';
 		    return '/'+SETTINGS.GamePath(moduleId);
 		};
+		// extend SYS1401 utility object, saving query from activate() function
+		SYS1401.query   = {};
+		// querystring #game?run=relative/path/to/module
+		SYS1401.SelectRun = function ( def ) {
+			SYS1401.query.run = SYS1401.query.run || def;
+			return SYS1401.query.run;
+		};
 
 		// load master settings asynchronously, then load game module
 		SETTINGS.Load (SETTINGS.SettingsURI(), _master, function () {
