@@ -245,15 +245,15 @@ define ([
 	});
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	Timer.method('Pause', function () { 
-		if (IsRunning()) this.isPaused = true;
+		if (this.IsRunning()) this.isPaused = true;
 	});
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	Timer.method('UnPause', function () { 
-		if (IsRunning()) this.isPaused = false; 
+		if (this.IsRunning()) this.isPaused = false; 
 	});
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	Timer.method('TogglePause', function () { 
-		if (IsRunning()) this.isPaused = !this.isPaused; 
+		if (this.IsRunning()) this.isPaused = !this.isPaused; 
 	});
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	Timer.method('IsComplete', function () {
