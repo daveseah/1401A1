@@ -86,9 +86,9 @@
 			gulp.src(BOWER+'requirejs/require.js').pipe(gulp.dest(VENDOR+'require')),
 			gulp.src(BOWER+'requirejs-text/text.js').pipe(gulp.dest(VENDOR+'require')),
 			// copy knockout
-			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VENDOR+'knockout')),
-			/* copy webrtc */
-			gulp.src(BOWER+'webrtc-adapter/release/adapter.js').pipe(gulp.dest(VENDOR+'webrtc-adapter'))
+			gulp.src(BOWER+'knockout.js/knockout.js').pipe(gulp.dest(VENDOR+'knockout'))
+			// NOTE: add additional bower assets in the 'copy-more-bower-assets' task
+			// this task is for 1401 essentials only
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -104,9 +104,11 @@
 			// copy howler
 			gulp.src(BOWER+'howler/*.js').pipe(gulp.dest(VENDOR+'howler')),
 			// copy physicsjs
-			gulp.src(BOWER+'physicsjs/dist/*.js').pipe(gulp.dest(VENDOR+'physicsjs'))
-			// some libraries are not bower-managed, saved in vendor-extra an
-			// e.g. socket-io, three.min, webrtc-adapter
+			gulp.src(BOWER+'physicsjs/dist/*.js').pipe(gulp.dest(VENDOR+'physicsjs')),
+			// copy webrtc shims
+			gulp.src(BOWER+'webrtc-adapter/release/adapter.js').pipe(gulp.dest(VENDOR+'webrtc-adapter'))
+			// NOTE: For libraries are not bower-managed, save them in 
+			// modules/vendor-extra and they will be copied over in 'copy-assets'
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -185,8 +187,8 @@
 		config = cfg || {};
 		config.debug = config.debug || false;
 
-		// spawn livereload configuration
-		LR.startLiveReload( config );
+		// spawn livereload configuration w/ default config
+		LR.startLiveReload();
 		// spawn the process!
 		spawnProcess( config );
 
