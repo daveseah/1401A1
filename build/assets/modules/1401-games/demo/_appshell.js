@@ -31,7 +31,7 @@ define ([
 	MOD.description = 'Game system testing code';
 
 	MOD.activate = function ( query ) {
-		SYS1401.EnableRunSelection( query );
+		SYS1401.GetGameModeQuery( query );
 	};
 	MOD.compositionComplete = function () {
 		MASTER.Start( this );

@@ -58,6 +58,8 @@ if (window.SYS1401) {
             SYS1401.RCFG.shim[module] = SYS1401.RCFG.shim[module] || {};
             SYS1401.RCFG.shim[module].deps = deps;
         }
+        // update module paths after each add
+        SYS1401.UpdateModulePaths();
     };
     // UpdateModulePaths() resets the requirejs path configuration using the SYS1401
     // global stored object. Use AddModulePath() to update this object.
@@ -74,16 +76,17 @@ if (window.SYS1401) {
     // file; this is a way to remind programmers that they need to add the
     // MOD.activate Durandal binding to capture queries
     SYS1401.queryEnabled = false;
-    SYS1401.EnableRunSelection = function ( query ) {
+    SYS1401.GetGameModeQuery = function ( query ) {
         SYS1401.queryEnabled = true;
         SYS1401.query = query || {};        
     };
     // path utility to grab ?run=relative/path/to/module from URL
     // so it can be used as argument in a LocalPath() call
-    SYS1401.SelectRun = function ( def ) {
+    SYS1401.GameMode = function ( def ) {
         if (SYS1401.queryEnabled) {
-            SYS1401.query.run = SYS1401.query.run || def;
-            return SYS1401.query.run;
+            SYS1401.query.mode = SYS1401.query.mode || def;
+            // all game modes must be in game-modes directory
+            return 'game-modes/'+SYS1401.query.mode;
         } else {
             console.error("_appshell.js must define .activate(query) that calls SYS1401.EnableRunSelection(query) to use run selection!");
         }

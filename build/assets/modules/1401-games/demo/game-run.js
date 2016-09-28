@@ -17,18 +17,8 @@ define ([
 	'1401/objects/sysloop',
 	'1401/system/renderer',
 	'1401/system/screen',
-/*** UNCOMMENT ONE TEST *****************************************************/
-//	SYS1401.LocalPath('tests/001-gameloop')
-//	SYS1401.LocalPath('tests/002-stars-finite')
-//	SYS1401.LocalPath('tests/003-stars-infinite')
-// 	SYS1401.LocalPath('tests/004-ship-movement')
-//	SYS1401.LocalPath('tests/005-btree-base')
-//	SYS1401.LocalPath('tests/006-btree-factory')
-//	SYS1401.LocalPath('tests/007-loadassets')
-//	SYS1401.LocalPath('tests/008-timer')
-//	SYS1401.LocalPath('tests/009-ship-bullets')
-	SYS1401.LocalPath('tests/010-screen')
-//	SYS1401.LocalPath('tests/011-webrtc-mirror'), 'webrtc-shim',
+	SYS1401.LocalPath(SYS1401.GameMode('009-ship-bullets')),
+	'webrtc-shim' // required for 011-webrtc-mirror
 ], function ( 
 	DBG,
 	SETTINGS,
