@@ -17,18 +17,8 @@ define ([
 	'1401/objects/sysloop',
 	'1401/system/renderer',
 	'1401/system/screen',
-/*** UNCOMMENT ONE TEST *****************************************************/
-//	SYS1401.LocalPath('tests/001-gameloop')
-//	SYS1401.LocalPath('tests/002-stars-finite')
-//	SYS1401.LocalPath('tests/003-stars-infinite')
-// 	SYS1401.LocalPath('tests/004-ship-movement')
-//	SYS1401.LocalPath('tests/005-btree-base')
-//	SYS1401.LocalPath('tests/006-btree-factory')
-//	SYS1401.LocalPath('tests/007-loadassets')
-//	SYS1401.LocalPath('tests/008-timer')
-//	SYS1401.LocalPath('tests/009-ship-bullets')
-	SYS1401.LocalPath('tests/010-screen')
-//	SYS1401.LocalPath('tests/011-webrtc-mirror'), 'webrtc-shim',
+	SYS1401.LocalPath(SYS1401.GameMode('009-ship-bullets')),
+	'webrtc-shim' // required for 011-webrtc-mirror
 ], function ( 
 	DBG,
 	SETTINGS,
@@ -63,6 +53,9 @@ define ([
 	It uses a different set of SYSLOOP handlers that need to be explicitly
 	enabled. See sysloop.js for documentation.
 
+	The actual main game logic is in the loaded GAME MODE module, located
+	in the game-modes directory
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /** PUBLIC API **************************************************************/
@@ -71,35 +64,7 @@ define ([
 	var MAIN = SYSLOOP.InitializeGame('Game-Main');
 
 	// add handlers as needed
-	MAIN.SetHandler( 'Connect'		, API_HandleConnect );
-	MAIN.SetHandler( 'Initialize'	, API_HandleInitialize );
 	MAIN.SetHandler( 'GameStep'		, API_GameStep );
-
-
-///////////////////////////////////////////////////////////////////////////////
-/** MODULE PRIVATE VARIABLES ************************************************/
-
-	var m_viewmodel;	// durandal viewmodel for databinding, system props
-
-
-///////////////////////////////////////////////////////////////////////////////
-/** MODULE PRIVATE FUNCTIONS ************************************************/
-
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Connect() passes the application viewmodel, giving modules the
-	opportunity to save a reference if it needs to access the HTML
-	layer of code (knockout variables, for example)
-/*/	function API_HandleConnect ( viewModel ) {
-
-		m_viewmodel = viewModel;
-	}
-
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Initialize() happens after Connect() is complete for all SYSLOOP modules.
-/*/	function API_HandleInitialize () {
-
-		// see TEST module for the initialization routine
-	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	MasterStep is a method reserved for the 'master game loop', which is

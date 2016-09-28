@@ -32,11 +32,10 @@ define ([
 	MAIN.SetHandler('Start', function () {} );
 	MAIN.SetHandler('GameStep', function () {} );  // master loop only
 
-	The actual "game code" is in the TEST module defined above. The various
-	test modules (e.g. test01, test02, etc) are also SYSLOOP modules, so
-	master.js is invoking the same handlers on those objects as well, 
-	allowing you to write independent-yet-synchronized modules without
-	having to add the glue code yourself.
+	The convention is to just set-up the master gameloop with the
+	MAIN.SetHandler('GameStep' ...) call, then to load a specific
+	runfile out of the game-modes subdirectory. For an example, see the
+	1401-games/demo app. 
 
 	Note that the critical GameStep is ONLY implemented by game-run.js.
 	It uses a different set of SYSLOOP handlers that need to be explicitly
