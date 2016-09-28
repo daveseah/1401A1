@@ -53,6 +53,9 @@ define ([
 	It uses a different set of SYSLOOP handlers that need to be explicitly
 	enabled. See sysloop.js for documentation.
 
+	The actual main game logic is in the loaded GAME MODE module, located
+	in the game-modes directory
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /** PUBLIC API **************************************************************/
@@ -61,35 +64,7 @@ define ([
 	var MAIN = SYSLOOP.InitializeGame('Game-Main');
 
 	// add handlers as needed
-	MAIN.SetHandler( 'Connect'		, API_HandleConnect );
-	MAIN.SetHandler( 'Initialize'	, API_HandleInitialize );
 	MAIN.SetHandler( 'GameStep'		, API_GameStep );
-
-
-///////////////////////////////////////////////////////////////////////////////
-/** MODULE PRIVATE VARIABLES ************************************************/
-
-	var m_viewmodel;	// durandal viewmodel for databinding, system props
-
-
-///////////////////////////////////////////////////////////////////////////////
-/** MODULE PRIVATE FUNCTIONS ************************************************/
-
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Connect() passes the application viewmodel, giving modules the
-	opportunity to save a reference if it needs to access the HTML
-	layer of code (knockout variables, for example)
-/*/	function API_HandleConnect ( viewModel ) {
-
-		m_viewmodel = viewModel;
-	}
-
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Initialize() happens after Connect() is complete for all SYSLOOP modules.
-/*/	function API_HandleInitialize () {
-
-		// see TEST module for the initialization routine
-	}
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	MasterStep is a method reserved for the 'master game loop', which is
