@@ -49,10 +49,10 @@ define ([
 		// instead of initializing renderer directly,
 		// use SCREEN which will initialize it for us
 		var cfg = {
-			mode 			: 'fixed',		// 'fixed', 'scaled', or 'fluid'
-			renderWidth 	: 512,			// width of viewport
-			renderHeight 	: 512,			// height of viewport
-			worldUnits 		: 512			// world units visible in viewport
+			renderViewport 	: 'fixed',		// 'fixed', 'scaled', or 'fluid'
+			renderWidth 	: 768,			// width of viewport
+			renderHeight 	: 768,			// height of viewport
+			renderUnits 	: 768			// world units visible in viewport
 		};
 		SCREEN.CreateLayout( cfg );
 
