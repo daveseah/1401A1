@@ -43,7 +43,7 @@ define ([
 	var MOD_GAME_RUN 	= 'game-run';	
 	var FILE_GAME_SET 	= 'game-settings.yaml';
 	// note that URI_GAME_DIR is overwritten with the ACTUAL module_id
-	// during InitializePaths()
+	// during m_InitializeGamePaths()
 	var URI_GAME_DIR 	= PATH_MODULES + PATH_1401_GAMES;
 
 	// game-specific paths are loaded via m_InitializeGamePaths()
