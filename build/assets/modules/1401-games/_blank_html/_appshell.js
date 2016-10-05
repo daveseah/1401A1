@@ -1,10 +1,13 @@
 /* _appshell.js */
 define ([ 
-	'1401/master',
+	'durandal/viewLocator',
+	'plugins/router',
 	'1401/js-extend/oop',		// returns empty object
-	'1401/js-extend/format',	// returns empty object
+	'1401/js-extend/format'		// returns empty object
+
 ], function (
-	MASTER,
+	viewLocator,
+	router,
 	js_oop,
 	js_format
 ) {
@@ -29,6 +32,14 @@ define ([
 
 	MOD.displayName = 'Blank HTML Template';
 	MOD.description = 'Put Your Description here in _appshell.js';
+
+	// Get the 1401-game module path by parsing the router's 
+	// moduleId (defined in shell.js router navigation array)
+	var moduleId = router.activeInstruction().config.moduleId;
+	moduleId = moduleId.substring(0,moduleId.lastIndexOf("/"));
+
+	// update subviews folder to load from game directory
+	viewLocator.useConvention(null,null,moduleId);
 
 	/**                                                                   **\
 		This Durandal viewmodel is ordinarily used to launch 1401, 
