@@ -65,7 +65,8 @@ define ([
 		// instead of initializing renderer directly,
 		// use SCREEN which will initialize it for us
 		var cfg = {
-			renderViewport 	: 'scaled',		// 'fixed', 'scaled', or 'fluid'
+			screenLayout 	: 'none',		// 'none', 'desktop', 'app'
+			renderViewport 	: 'fixed',		// 'fixed', 'scaled', or 'fluid'
 			renderWidth 	: 768,			// width of viewport
 			renderHeight 	: 768,			// height of viewport
 			renderUnits 	: 768			// world units visible in viewport

@@ -60,83 +60,38 @@ define ( [
 		SCREEN.Debug 	= null;			// debug area
 		SCREEN.Info 	= null;			// informational area
 
+		SCREEN.TYPE 	= {
+			MODE_NONE : 'none',
+			MODE_DESKTOP : 'desktop',
+			MODE_APP : 'app'
+		};
+
+
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	grab handles to all main elements of the screen.
-/*/	SCREEN.Initialize = function ( cfg ) {
+/*/	SCREEN.InitializeDefault = function ( cfg ) {
+//		var root = document.getElementById('sys1401');
 		var id = ROOT_ID;
 		var root = document.getElementById(id);
 		if (!root) {
 			console.warn("SCREEN requires div #"+id,"element");
 			return;
 		} 
-		// define main areas, redefine root as jquery object
+		// define main areas
 		m_root = root = $(root);
 		if (m_root.children().length) {
 			console.warn('SCREEN is erasing existing children of div#'+id);
 		}
 		root.empty();
-
-/*/
-	SEP 30, 2016
-	REWRITING INITIALIZE so it can take columns into account and provide writing to them.
-	The renderer for WebGL will need to shrink not to the browser dimensions, 
-	but to the containing span.
-
-	Right now, the insertion of the html works based on the passed cfg, but the layout code is still buggy.
-/*/
-
-		// check layout mode
-		var spanTotal = 0;
-		var columnTotal = cfg.columns.length;
-
-		var el, elRenderer;
-		var elRow = $("<div class='row'></div>");
-		root.append(elRow);
-
-		for (var i=0;i<columnTotal;i++) {
-			var col = cfg.columns[i];
-			// check column spans
-			if ((col.span<1)||(col.span>12)) 
-				throw "SCREEN: col span "+col.span+" invalid";
-			if (col.span)
-				spanTotal += col.span;
-			if (spanTotal > 12) 
-				throw "SCREEN: cumulative col span > 12";
-			// check renderer
-			if ((col.type==='renderer')&&(elRenderer))
-				throw "SCREEN: Only 1 'renderer' allowed";
-
-			// if we get this far, then assume all data is valid
-			switch (col.type) {
-				case 'html':
-					el = $('<div class="col-md-'+col.span+'"></div>');
-					break;
-				case 'renderer': 
-					el = $('<div class="col-md-'+col.span+'"></div>');
-					root = el;
-					elRenderer = $('<div id="'+RENDERER_ID+'" class="col-md-'+col.span+'"></div>');
-					break;
-				default:
-					throw "column type "+col.type+" not understood";
-			}
-			// at this point we have an element we can add to the row
-			elRow.append(el);
-			console.log('column',i,'=',JSON.stringify(col));
-		}
-
 		root.append( '<div id="nfo1401"></div>' );
-		SCREEN.Info 	= $( '#nfo1401' );
-
-		root.append( elRenderer );
-		SCREEN.Main 	= $( '#'+RENDERER_ID );
-
+		root.append( '<div id="'+RENDERER_ID+'"></div>' );
 		root.append( '<div id="dbg1401"></div>' );
+		// save references
+		SCREEN.Root 	= m_root;
+		SCREEN.Main 	= $( '#'+RENDERER_ID );
+		SCREEN.Info 	= $( '#nfo1401' );
 		SCREEN.Debug 	= $( '#dbg1401' );
-
-		// save root references
-		SCREEN.Root 	= root; // same as m_root
-
-		// add sub areas
+		// sub areas
 		SCREEN.Main.append( '<div id="renderer-overlay"></div>' );
 		SCREEN.Overlay 	= $( '#renderer-overlay' );
 
@@ -153,35 +108,6 @@ define ( [
 		SCREEN.Debug.css('background-color','rgba(192,192,192,0.5)');
 		// add info styling
 		SCREEN.Info.css('font-size','smaller');
-	};
-
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.RootAppend = function ( htmlstr ) {
-		SCREEN.Root.append(htmlstr);
-	};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.RootPrepend = function ( htmlstr ) {
-		SCREEN.Root.prepend(htmlstr);
-	};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	SCREEN.WebGLCanvas = function () {
-		return RENDERER.Viewport().WebGLCanvas();
-	};
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Call during CONSTRUCT phase, so INITIALIZE has had time to run
-/*/	SCREEN.CreateLayout = function ( cfg ) {
-
-		// check parameters
-		u_NormalizeConfig( cfg );
-		if (!m_root) SCREEN.Initialize( cfg );
-
-		// info
-		console.info('SCREEN is setting-up',cfg.columns.count,'column layout with',cfg.renderViewport,'layout');
-
-		// add 'attachTo' parameter for RENDERER 
-		cfg.attachId = RENDERER_ID;	
-		// save configuration for later adjustment
-		m_cfg = cfg;
 
 		// special case for fluid
 		if (cfg.renderViewport===VIEWPORT.TYPE.MODE_FLUID) {
@@ -207,6 +133,54 @@ define ( [
 				break;
 			default:
 				throw "mode "+cfg.renderViewport+" not implemented";
+		}		
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/
+/*/	SCREEN.InitializeDesktopMode = function ( cfg ) {
+		throw "InitializeDesktopMode() not implemented";
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/
+/*/	SCREEN.InitializeAppMode = function ( cfg ) {
+		throw "InitializeAppMode() not implemented";
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.RootAppend = function ( htmlstr ) {
+		SCREEN.Root.append(htmlstr);
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.RootPrepend = function ( htmlstr ) {
+		SCREEN.Root.prepend(htmlstr);
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.WebGLCanvas = function () {
+		return RENDERER.Viewport().WebGLCanvas();
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Call during CONSTRUCT phase, so INITIALIZE has had time to run
+/*/	SCREEN.CreateLayout = function ( cfg ) {
+
+		// check parameters
+		u_NormalizeConfig( cfg );
+		// add 'attachTo' parameter for RENDERER 
+		cfg.attachId = RENDERER_ID;	
+		// save configuration for later adjustment
+		m_cfg = cfg;
+
+		// handle mode setup
+		switch (cfg.screenLayout) {
+			case SCREEN.TYPE.MODE_NONE:
+				SCREEN.InitializeDefault( cfg );
+				break;
+			case SCREEN.TYPE.MODE_DESKTOP:
+				SCREEN.InitializeDesktopMode( cfg );
+				break;
+			case SCREEN.TYPE.MODE_APP:
+				SCREEN.InitializeAppMode( cfg );
+				break;
+			default:
+				throw "Unexpected screenLayout "+cfg.screenLayout;
 		}
 
 		// start renderer refresh
@@ -383,6 +357,18 @@ define ( [
 				break;
 			default:
 				throw "SCREEN: "+cfg.renderViewport+" is not a valid mode";
+		}
+		switch (cfg.screenLayout) {
+			case undefined:
+				cfg.screenLayout = SCREEN.TYPE.MODE_NONE;
+				console.warn('SCREEN: no screenLayout defined; using default');
+				break;
+			case SCREEN.TYPE.MODE_NONE:
+			case SCREEN.TYPE.MODE_DESKTOP:
+			case SCREEN.TYPE.MODE_APP:
+				break;
+			default:
+				throw "SCREEN: "+cfg.screenLayout+" is not a valid layout";
 		}
 		// process render parameters
 		cfg.renderWidth = cfg.renderWidth || 512;
