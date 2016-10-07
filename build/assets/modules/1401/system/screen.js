@@ -560,6 +560,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.HideLeft = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideLeft() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (lobj.leftWidthSaved) {
 			console.warn('left sidebar already hidden');
@@ -572,6 +574,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.ShowLeft = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowLeft() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (!lobj.leftWidthSaved) {
 			console.warn('left sidebar already showing');
@@ -584,6 +588,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.HideRight = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideRight() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (lobj.rightWidthSaved) {
 			console.warn('right sidebar already hidden');
@@ -596,6 +602,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.ShowRight = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowRight() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (!lobj.rightWidthSaved) {
 			console.warn('right sidebar already showing');
@@ -608,6 +616,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.HideTop = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideTop() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (lobj.topHeightSaved) {
 			console.warn('top already hidden');
@@ -620,6 +630,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.ShowTop = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowTop() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (!lobj.topHeightSaved) {
 			console.warn('top already showing');
@@ -632,6 +644,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.HideBottom = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideBottom() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (lobj.bottomHeightSaved) {
 			console.warn('top already hidden');
@@ -644,6 +658,8 @@ define ( [
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	SCREEN.ShowBottom = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowBottom() available only in CONSOLE mode";
 		var lobj = m_GetLayout();
 		if (!lobj.bottomHeightSaved) {
 			console.warn('top already showing');
