@@ -171,7 +171,7 @@ define ( [
 		var lobj = {
 			// top header
 			top 			: null,
-			topHeight 		: cfg.topHeight || 80,
+			topHeight 		: cfg.topHeight || cfg.topHeight===0 ? 0 : 80,
 			// middle table and table row
 			middle 			: null,
 			midrow 			: null,
@@ -179,13 +179,13 @@ define ( [
 			main 			: null,
 			// left sidebar
 			left 			: null,
-			leftWidth 		: cfg.leftWidth || 160,
+			leftWidth 		: cfg.leftWidth || cfg.leftWidth===0 ? 0 : 160,
 			// right sidebar
 			right 			: null,
-			rightWidth 		: cfg.rightWidth || 160,
+			rightWidth 		: cfg.rightWidth || cfg.rightWidth===0 ? 0 : 160,
 			// bottom footer
 			bottom 			: null,
-			bottomHeight	: cfg.bottomHeight || 80
+			bottomHeight	: cfg.bottomHeight || cfg.bottomHeight===0 ? 0 : 80
 			// visibility flags
 		};
 
@@ -218,11 +218,27 @@ define ( [
 		lobj.bottom.css('background-color','#EEE');
 
 		// set dimensions
-		lobj.top.height(lobj.topHeight);
-		lobj.bottom.height(lobj.bottomHeight);
+		if (lobj.topHeight===0) {
+			lobj.top.hide();
+		} else {
+			lobj.top.height(lobj.topHeight);
+		}
+		if (lobj.bottomHeight===0) {
+			lobj.bottom.hide();
+		} else {
+			lobj.bottom.height(lobj.bottomHeight);
+		}
 		lobj.middle.width('100%');
-		lobj.left.width(lobj.leftWidth);
-		lobj.right.width(lobj.rightWidth);
+		if (lobj.leftWidth===0) {
+			lobj.left.hide();
+		} else {
+			lobj.left.width(lobj.leftWidth);
+		}
+		if (lobj.rightWidth===0) {
+			lobj.right.hide();
+		} else {
+			lobj.right.width(lobj.rightWidth);
+		}
 
 		// save references to layout table
 		m_SaveLayout(cfg.screenLayout, lobj);
