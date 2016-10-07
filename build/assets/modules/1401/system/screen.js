@@ -240,9 +240,10 @@ define ( [
 
 		// special case for fluid
 		if (cfg.renderViewport===VIEWPORT.TYPE.MODE_FLUID) {
-			cfg.renderWidth  = lobj.main.width();
-			cfg.renderHeight = lobj.main.height();
-			cfg.renderUnits  = Math.min(lobj.main.width(),lobj.main.height());
+			var dim = u_GetLayoutDimensions();
+			cfg.renderWidth  = dim.boxWidth;
+			cfg.renderHeight = dim.boxHeight;
+			cfg.renderUnits  = Math.min(dim.boxWidth,dim.boxHeight);
 		}
 		// Start renderer
 		RENDERER.Initialize ( cfg );
@@ -255,9 +256,13 @@ define ( [
 				break;
 			case VIEWPORT.TYPE.MODE_SCALED:
 				SCREEN.ConsoleSetScaled ( cfg );
+				SCREEN.Info.hide();
+				SCREEN.Debug.hide();
 				break;
 			case VIEWPORT.TYPE.MODE_FLUID:
 				SCREEN.ConsoleSetFluid ( cfg );
+				SCREEN.Info.hide();
+				SCREEN.Debug.hide();
 				break;
 			default:
 				throw "mode "+cfg.renderViewport+" not implemented";
@@ -328,7 +333,7 @@ define ( [
 		u_ConsoleScaleToFit();
 	}; 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	When scaling the renderer, we don't need to adjust any camera parameters
+/*/	scale renderer to maximally fit into browser
 /*/	function u_ScaleToFit () {
 		var dim = u_GetBrowserDimensions();
 		var canvas = $(VIEWPORT.WebGLCanvas());
@@ -345,7 +350,7 @@ define ( [
 		SCREEN.Debug.css('top',dim.boxBottom+'px');
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	When scaling the renderer, we don't need to adjust any camera parameters
+/*/	scale renderer to maximally fit into console layout mode
 /*/	function u_ConsoleScaleToFit () {
 		var dim = u_GetLayoutDimensions();
 		var canvas = $(VIEWPORT.WebGLCanvas());
@@ -359,7 +364,7 @@ define ( [
 		SCREEN.Main.height(dim.scaledHeight);
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	a fluid layout resizes itself to fill all available space
+/*/	resize renderer to fill available browser space
 /*/	SCREEN.SetFluid = function ( cfg ) {
 		// hide nfo and debug
 		SCREEN.Debug.hide();
@@ -372,6 +377,16 @@ define ( [
 		u_ResizeToFit();
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	resize renderer to fill available space in console layout mode
+/*/	SCREEN.ConsoleSetFluid = function ( cfg ) {
+		// resize viewport on browser resize after 250ms
+		$(window).resize(function () {
+			clearTimeout(m_resize_timer);
+			m_resize_timer = setTimeout(u_ConsoleResizeToFit,250);
+		});
+		u_ConsoleResizeToFit();
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	When resizing the renderer, we need to adjust camera parameters so 
 	the world is still drawn 1:1
 /*/	function u_ResizeToFit () {
@@ -381,7 +396,16 @@ define ( [
 		VIEWPORT.UpdateWorldCameras();
 		VIEWPORT.UpdateViewportCameras();
 	}
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	When resizing the renderer, we need to adjust camera parameters so 
+	the world is still drawn 1:1
+/*/	function u_ConsoleResizeToFit () {
+		var dim = u_GetLayoutDimensions();
 
+		VIEWPORT.SetDimensions(dim.boxWidth, dim.boxHeight);
+		VIEWPORT.UpdateWorldCameras();
+		VIEWPORT.UpdateViewportCameras();
+	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function u_GetBrowserDimensions () {
 		var root = SCREEN.Root;
@@ -442,7 +466,7 @@ define ( [
 		dim.scaledHeight = Math.floor(m_cfg.renderHeight * multiplier);
 		dim.scaledWidth = Math.floor(dim.scaledHeight * aspect);
 		dim.boxWidth = calcWidth;
-		dim.boxHeight = dim.scaledHeight;
+		dim.boxHeight = calcHeight;
 
 		return dim;
 	}
