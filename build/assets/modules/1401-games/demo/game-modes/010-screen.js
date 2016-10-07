@@ -217,6 +217,21 @@ define ([
 	function m_Start() {
 		SHIPCONTROLS.BindKeys();
 
+		// sidebar manipulation tests
+		console.log('hide sidebars in 3 seconds');
+		setTimeout(function(){
+			console.log('hidden!');
+			SCREEN.HideTop();
+			SCREEN.ShowBottom();
+			SCREEN.HideRight();
+			console.log('show sidebar in 3 seconds');
+			setTimeout(function(){
+				console.log('showing!');
+				SCREEN.ShowTop();
+				SCREEN.HideBottom();
+				SCREEN.ShowRight();
+			},3000);
+		},3000);
 		window.DBG_Out( "TEST 10 <b>Screen Modes!</b>" );
 		window.DBG_Out( "<tt>game-main include: 1401-games/demo/tests/010</tt>" );
 		window.DBG_Out( "Use WASDQE to move. SPACE brakes. C fires." );

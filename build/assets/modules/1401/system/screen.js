@@ -38,6 +38,17 @@ define ( [
 	SCALED 	- #renderer canvas is scaled to fit browser window
 	FLUID 	- #renderer is 1:1 pixels but is resized
 
+	SCREEN MODES
+
+	CONSOLE - fixed presentation on large screen, with sidebar areas 
+			  surrounding a WebGL canvas
+	MOBILE 	- responsive presentation on small screens, using a 
+			  ui framework, with an optional WebGL canvas
+	NONE    - no sidebar areas at all
+
+	Both a LAYOUT RULE and a SCREEN MODE can be set, and they will behave
+	as you would expect.
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /** PRIVATE SYSTEM VARIABLES *************************************************/
@@ -144,20 +155,8 @@ define ( [
 		RENDERER.Initialize ( cfg );
 		window.SYS1401.WEBGL = VIEWPORT.WebGL();
 
-		// dispatch correct display mode
-		switch (cfg.renderViewport) {
-			case VIEWPORT.TYPE.MODE_FIXED:
-				SCREEN.SetFixed ( cfg );
-				break;
-			case VIEWPORT.TYPE.MODE_SCALED:
-				SCREEN.SetScaled ( cfg );
-				break;
-			case VIEWPORT.TYPE.MODE_FLUID:
-				SCREEN.SetFluid ( cfg );
-				break;
-			default:
-				throw "mode "+cfg.renderViewport+" not implemented";
-		}		
+		// resize according to screen mode
+		SCREEN.RefreshDimensions( cfg );
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Desktop mode is used for main presentation that requires sidebar UI areas
@@ -265,24 +264,55 @@ define ( [
 		RENDERER.Initialize ( cfg );
 		window.SYS1401.WEBGL = VIEWPORT.WebGL();
 
-		// dispatch correct display mode
-		switch (cfg.renderViewport) {
-			case VIEWPORT.TYPE.MODE_FIXED:
-				SCREEN.ConsoleSetFixed ( cfg );
+		// resize according to screen mode
+		SCREEN.RefreshDimensions( cfg );
+	};
+
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Call this to resize the screenbased on the screen mode and the viewport
+	mode, which is read from the config passed in OR the saved global config
+/*/	SCREEN.RefreshDimensions = function ( cfg ) {
+		cfg = cfg || m_cfg;
+		switch (cfg.screenLayout) {
+			case SCREEN.T_NONE:
+				// dispatch correct display mode
+				switch (cfg.renderViewport) {
+					case VIEWPORT.TYPE.MODE_FIXED:
+						SCREEN.SetFixed ( cfg );
+						break;
+					case VIEWPORT.TYPE.MODE_SCALED:
+						SCREEN.SetScaled ( cfg );
+						break;
+					case VIEWPORT.TYPE.MODE_FLUID:
+						SCREEN.SetFluid ( cfg );
+						break;
+					default:
+						throw "mode "+cfg.renderViewport+" not implemented";
+				}		
 				break;
-			case VIEWPORT.TYPE.MODE_SCALED:
-				SCREEN.ConsoleSetScaled ( cfg );
-				SCREEN.Info.hide();
-				SCREEN.Debug.hide();
-				break;
-			case VIEWPORT.TYPE.MODE_FLUID:
-				SCREEN.ConsoleSetFluid ( cfg );
-				SCREEN.Info.hide();
-				SCREEN.Debug.hide();
-				break;
-			default:
-				throw "mode "+cfg.renderViewport+" not implemented";
-		}			
+			case SCREEN.T_CONSOLE:
+				switch (cfg.renderViewport) {
+					case VIEWPORT.TYPE.MODE_FIXED:
+						SCREEN.ConsoleSetFixed ( cfg );
+						break;
+					case VIEWPORT.TYPE.MODE_SCALED:
+						SCREEN.ConsoleSetScaled ( cfg );
+						SCREEN.Info.hide();
+						SCREEN.Debug.hide();
+						break;
+					case VIEWPORT.TYPE.MODE_FLUID:
+						SCREEN.ConsoleSetFluid ( cfg );
+						SCREEN.Info.hide();
+						SCREEN.Debug.hide();
+						break;
+					default:
+						throw "mode "+cfg.renderViewport+" not implemented";
+				}
+				break;			
+			case SCREEN.T_MOBILE:
+				throw "MOBILE NOT IMPLEMENTED";
+		}
+
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/
@@ -527,6 +557,118 @@ define ( [
 		var jbtn = $(html);
 		parent.append(jbtn);
 		return jbtn;
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.HideLeft = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideLeft() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (lobj.leftWidthSaved) {
+			console.warn('left sidebar already hidden');
+		} else {
+			lobj.leftWidthSaved = lobj.leftWidth;
+			lobj.leftWidth = 0;	// used for calculation
+			lobj.left.hide();
+			SCREEN.RefreshDimensions();
+		}
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.ShowLeft = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowLeft() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (!lobj.leftWidthSaved) {
+			console.warn('left sidebar already showing');
+		} else {
+			lobj.leftWidth = lobj.leftWidthSaved;
+			lobj.leftWidthSaved = 0;
+			lobj.left.show();
+			SCREEN.RefreshDimensions();
+		}
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.HideRight = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideRight() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (lobj.rightWidthSaved) {
+			console.warn('right sidebar already hidden');
+		} else {
+			lobj.rightWidthSaved = lobj.rightWidth;
+			lobj.rightWidth = 0;	// used for calculation
+			lobj.right.hide();
+			SCREEN.RefreshDimensions();
+		}
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.ShowRight = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowRight() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (!lobj.rightWidthSaved) {
+			console.warn('right sidebar already showing');
+		} else {
+			lobj.rightWidth = lobj.rightWidthSaved;
+			lobj.rightWidthSaved = 0;
+			lobj.right.show();
+			SCREEN.RefreshDimensions();
+		}
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.HideTop = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideTop() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (lobj.topHeightSaved) {
+			console.warn('top already hidden');
+		} else {
+			lobj.topHeightSaved = lobj.topHeight;
+			lobj.topHeight = 0;	// used for calculation
+			lobj.top.hide();
+			SCREEN.RefreshDimensions();
+		}
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.ShowTop = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowTop() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (!lobj.topHeightSaved) {
+			console.warn('top already showing');
+		} else {
+			lobj.topHeight = lobj.topHeightSaved;
+			lobj.topHeightSaved = 0;
+			lobj.top.show();
+			SCREEN.RefreshDimensions();
+		}
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.HideBottom = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.HideBottom() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (lobj.bottomHeightSaved) {
+			console.warn('top already hidden');
+		} else {
+			lobj.bottomHeightSaved = lobj.bottomHeight;
+			lobj.bottomHeight = 0;	// used for calculation
+			lobj.bottom.hide();
+			SCREEN.RefreshDimensions();
+		}
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	SCREEN.ShowBottom = function () {
+		if (m_cfg.screenLayout!==SCREEN.T_CONSOLE)
+			throw "SCREEN.ShowBottom() available only in CONSOLE mode";
+		var lobj = m_GetLayout();
+		if (!lobj.bottomHeightSaved) {
+			console.warn('top already showing');
+		} else {
+			lobj.bottomHeight = lobj.bottomHeightSaved;
+			lobj.bottomHeightSaved = 0;
+			lobj.bottom.show();
+			SCREEN.RefreshDimensions();
+		}
 	};
 
 
