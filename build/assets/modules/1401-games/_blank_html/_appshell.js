@@ -1,10 +1,13 @@
 /* _appshell.js */
 define ([ 
-	'1401/master',
+	'durandal/viewLocator',
+	'plugins/router',
 	'1401/js-extend/oop',		// returns empty object
-	'1401/js-extend/format',	// returns empty object
+	'1401/js-extend/format'		// returns empty object
+
 ], function (
-	MASTER,
+	viewLocator,
+	router,
 	js_oop,
 	js_format
 ) {
@@ -27,33 +30,28 @@ define ([
 
 	var MOD = {};
 
-	MOD.displayName = 'Game Demo';
-	MOD.description = 'Game system testing code';
+	MOD.displayName = 'Blank HTML Template';
+	MOD.description = 'Put Your Description here in _appshell.js';
+
+	// Get the 1401-game module path by parsing the router's 
+	// moduleId (defined in shell.js router navigation array)
+	var moduleId = router.activeInstruction().config.moduleId;
+	moduleId = moduleId.substring(0,moduleId.lastIndexOf("/"));
+
+	// update subviews folder to load from game directory
+	viewLocator.useConvention(null,null,moduleId);
 
 	/**                                                                   **\
-		This Durandal viewmodel is used to launch 1401, the game engine.
-		We hook some Durandal events to (1) read the URL query string and
-		(2) initialize the 1401 game engine, which next launch the 
-		'game-run.js' file located in the same directory as this file.
+		This Durandal viewmodel is ordinarily used to launch 1401, 
+		the game engine, but all that stuff is removed to for simpler
+		experimentation without 1401 Game Engine support. 
+
+		See 1401-games/_blank or 1401-games/demo for the activation hooks
+		that launch 1401 game features.
 	\**                                                                   **/
-
-	// the 'activate' hook is used to read the query string
-	MOD.activate = function ( query ) {
-		SYS1401.GetGameModeQuery( query );
-	};
-	// the 'compositionComplete' hook runs when all HTML has rendered
-	// so the UI is stable enough to run the game system
-	MOD.compositionComplete = function () {
-		MASTER.Start( this );
-		// game-run.js is executed by MASTER.Start()
-		// game-settings.yaml is loaded by MASTER.Start()
-	};
-
 
 ///////////////////////////////////////////////////////////////////////////////
 /** RETURN MODULE DEFINITION FOR REQUIREJS ***********************************/
 	return MOD;
 
 });
-
-

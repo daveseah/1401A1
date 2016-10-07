@@ -18,6 +18,7 @@ define ([
 	'1401/system/renderer',
 	'1401/system/screen',
 	SYS1401.LocalPath(SYS1401.GameMode('009-ship-bullets')),
+//	SYS1401.LocalPath(SYS1401.GameMode('010-screen')),
 	'webrtc-shim' // required for 011-webrtc-mirror
 ], function ( 
 	DBG,

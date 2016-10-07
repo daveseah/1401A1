@@ -6,7 +6,7 @@ define ([
 	'1401/system/screen',
 	'1401/system/visualfactory',
 	'1401/system/piecefactory',
-	SYS1401.LocalPath('example-component')
+	SYS1401.LocalPath(SYS1401.GameMode('example-component'))
 ], function ( 
 	SETTINGS,
 	SYSLOOP,
@@ -82,13 +82,13 @@ define ([
 		// instead of initializing renderer directly,
 		// use SCREEN which will initialize it for us
 		var cfg = {
-			mode 			: 'scaled',		// layout mode
+			renderViewport 	: 'fixed',		// layout mode
 			renderWidth 	: 768,			// width of viewport
 			renderHeight 	: 768,			// height of viewport
 			worldUnits 		: 768			// world units visible in viewport
 		};
 		SCREEN.CreateLayout( cfg );
-		SCREEN.SetInfo('<h4>PlanTitle</h4><p>Starter tempalte</p>');
+		SCREEN.SetInfo('<h4>PlanTitle</h4><p>Starter template</p>');
 		SCREEN.SetDisplayMargin(20);
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

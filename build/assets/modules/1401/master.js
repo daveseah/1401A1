@@ -4,7 +4,7 @@ SYS1401.AddModulePath( '1401-games', '1401-games');
 SYS1401.AddModulePath( 'yaml', 'vendor/yaml.js/yaml','YAML' );
 SYS1401.AddModulePath( 'three', 'vendor-extra/three.min','THREE' );
 SYS1401.AddModulePath( 'physicsjs', 'vendor/physicsjs/physicsjs-full.min' );
-SYS1401.UpdateModulePaths();
+
 define ([
 	'plugins/router',
 	'1401/system/debug',
@@ -119,7 +119,7 @@ define ([
 		var module_path = SETTINGS.GameMainModulePath( moduleId );
 		m_game = null;
 
-		/* load game module asynchronously */
+		// load game module asynchronously 
 		// this breaks with mimosa build -omp
 		var str = module_path;
 		if (module_path.length>32) 
