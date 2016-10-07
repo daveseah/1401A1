@@ -44,50 +44,74 @@ define ( [
 
 	var ROOT_ID 		= 'display';	// id of parent div
 	var RENDERER_ID		= 'renderer';	// id of renderer div
-	var m_root 			= null;			// jquery obj (also in SCREEN.Root)
 	var m_cfg 			= null;			// remember configuration
 	var m_resize_timer	= null;			// screen resizing delay
+	var m_layouts		= {};			// layout dictionary objects
+	var mode_layout 	= null;			// current layout mode in m_layouts
+	var mode_vp 		= null;			// current viewport mode
 
 
 ///////////////////////////////////////////////////////////////////////////////
 /** SYSLOOP API **************************************************************/
 
-	var SCREEN 			= {};
-		SCREEN.Root 	= null;
-		SCREEN.Main 	= null;			// main renderer area
-		SCREEN.Overlay 	= null;			// html over Main
-		SCREEN.CPanel 	= null;			// control panel
-		SCREEN.Debug 	= null;			// debug area
-		SCREEN.Info 	= null;			// informational area
+	var SCREEN 				= {};
+		SCREEN.Root 		= null;
+		SCREEN.Main 		= null;			// main renderer area
+		SCREEN.Overlay 		= null;			// html over Main
+		SCREEN.CPanel 		= null;			// control panel
+		SCREEN.Debug 		= null;			// debug area
+		SCREEN.Info 		= null;			// informational area
 
-		SCREEN.TYPE 	= {
-			MODE_NONE : 'none',
-			MODE_DESKTOP : 'desktop',
-			MODE_APP : 'app'
-		};
-
+		SCREEN.T_NONE 		= 'none';
+		SCREEN.T_CONSOLE 	= 'console';
+		SCREEN.T_MOBILE 	= 'mobile';
+		// hacky access to constructor types, e.g. SCREEN.TYPE.T_NONE
+		SCREEN.TYPE 		= SCREEN;		
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	grab handles to all main elements of the screen.
-/*/	SCREEN.InitializeDefault = function ( cfg ) {
-//		var root = document.getElementById('sys1401');
-		var id = ROOT_ID;
-		var root = document.getElementById(id);
-		if (!root) {
-			console.warn("SCREEN requires div #"+id,"element");
-			return;
-		} 
-		// define main areas
-		m_root = root = $(root);
-		if (m_root.children().length) {
-			console.warn('SCREEN is erasing existing children of div#'+id);
+/*/	MAIN CALL. Valid during CONSTRUCT phase
+/*/	SCREEN.CreateLayout = function ( cfg ) {
+
+		// check parameters
+		u_NormalizeConfig( cfg );
+
+		// add 'attachTo' parameter for RENDERER 
+		cfg.attachId = RENDERER_ID;	
+
+		// save configuration for later adjustment
+		m_cfg 		= cfg;
+		mode_vp 	= cfg.renderViewport;
+		mode_layout	= cfg.screenLayout;
+
+		// handle mode setup
+		switch (cfg.screenLayout) {
+			case SCREEN.T_NONE:
+				SCREEN.InitializeDefault( cfg );
+				break;
+			case SCREEN.T_CONSOLE:
+				SCREEN.InitializeDesktopMode( cfg );
+				break;
+			case SCREEN.T_MOBILE:
+				SCREEN.InitializeAppMode( cfg );
+				break;
+			default:
+				throw "Unexpected screenLayout "+cfg.screenLayout;
 		}
-		root.empty();
+
+		// start renderer refresh
+		RENDERER.AutoRender();
+
+	}; 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Renderer is the main element on the screen, unlike Console or App mode
+/*/	SCREEN.InitializeDefault = function ( cfg ) {
+		var root = m_DefineRoot();
+
 		root.append( '<div id="nfo1401"></div>' );
 		root.append( '<div id="'+RENDERER_ID+'"></div>' );
 		root.append( '<div id="dbg1401"></div>' );
 		// save references
-		SCREEN.Root 	= m_root;
+		SCREEN.Root 	= root;
 		SCREEN.Main 	= $( '#'+RENDERER_ID );
 		SCREEN.Info 	= $( '#nfo1401' );
 		SCREEN.Debug 	= $( '#dbg1401' );
@@ -123,22 +147,121 @@ define ( [
 		// dispatch correct display mode
 		switch (cfg.renderViewport) {
 			case VIEWPORT.TYPE.MODE_FIXED:
-				SCREEN.SetFixedLayout ( cfg );
+				SCREEN.SetFixed ( cfg );
 				break;
 			case VIEWPORT.TYPE.MODE_SCALED:
-				SCREEN.SetScaledLayout ( cfg );
+				SCREEN.SetScaled ( cfg );
 				break;
 			case VIEWPORT.TYPE.MODE_FLUID:
-				SCREEN.SetFluidLayout ( cfg );
+				SCREEN.SetFluid ( cfg );
 				break;
 			default:
 				throw "mode "+cfg.renderViewport+" not implemented";
 		}		
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/
+/*/	Desktop mode is used for main presentation that requires sidebar UI areas
+	that can be shown/hidden on demand
 /*/	SCREEN.InitializeDesktopMode = function ( cfg ) {
-		throw "InitializeDesktopMode() not implemented";
+		// define default sizing parameters
+
+		// [      T      ]
+		// [ L ][ M ][ R ] 
+		// [      B      ]
+		var lobj = {
+			// top header
+			top 			: null,
+			topHeight 		: cfg.topHeight || 80,
+			// middle table and table row
+			middle 			: null,
+			midrow 			: null,
+			// main render area
+			main 			: null,
+			// left sidebar
+			left 			: null,
+			leftWidth 		: cfg.leftWidth || 160,
+			// right sidebar
+			right 			: null,
+			rightWidth 		: cfg.rightWidth || 160,
+			// bottom footer
+			bottom 			: null,
+			bottomHeight	: cfg.bottomHeight || 80
+			// visibility flags
+		};
+
+		// grab empty jquery ROOT element
+		var jqroot 	= m_DefineRoot();
+
+		// define areas
+		lobj.top 	= $('<div id="top"></div>');
+		lobj.bottom = $('<div id="bottom"></div>');
+		lobj.middle = $('<table></table>');
+		lobj.midrow = $('<tr></tr>');
+		lobj.left 	= $('<td id="left"></td>');
+		lobj.main 	= $('<td id="main" align="center"></td>');
+		lobj.right 	= $('<td id="right"></td>');
+
+		// construct 
+		jqroot.append('<div id="nfo1401"></div>');
+		lobj.midrow.append(lobj.left,lobj.main,lobj.right);
+		lobj.middle.append(lobj.midrow);
+		jqroot.append(lobj.top,lobj.middle,lobj.bottom);
+		jqroot.append('<div id="dbg1401"></div>');
+		// add renderer
+		lobj.main.append('<div id="'+RENDERER_ID+'"></div>');
+		lobj.main.append('<div id="renderer-overlay"></div>');
+
+		// set background colors
+		lobj.top.css('background-color','#EEE');
+		lobj.left.css('background-color','#DDD');
+		lobj.right.css('background-color','#DDD');
+		lobj.bottom.css('background-color','#EEE');
+
+		// set dimensions
+		lobj.top.height(lobj.topHeight);
+		lobj.bottom.height(lobj.bottomHeight);
+		lobj.middle.width('100%');
+		lobj.left.width(lobj.leftWidth);
+		lobj.right.width(lobj.rightWidth);
+
+		// save references to layout table
+		m_SaveLayout(cfg.screenLayout, lobj);
+
+		// save SCREEN globals
+		SCREEN.Root 	= jqroot;
+		SCREEN.Main 	= $('#'+RENDERER_ID );
+		SCREEN.Info 	= $('#nfo1401');
+		SCREEN.Debug 	= $('#dbg1401');
+		SCREEN.Overlay 	= $('#renderer-overlay');
+
+		SCREEN.Main.css('position','relative');		
+		SCREEN.Overlay.css('position','absolute');
+		SCREEN.Overlay.css('top',0);
+
+		// special case for fluid
+		if (cfg.renderViewport===VIEWPORT.TYPE.MODE_FLUID) {
+			cfg.renderWidth  = lobj.main.width();
+			cfg.renderHeight = lobj.main.height();
+			cfg.renderUnits  = Math.min(lobj.main.width(),lobj.main.height());
+		}
+		// Start renderer
+		RENDERER.Initialize ( cfg );
+		window.SYS1401.WEBGL = VIEWPORT.WebGL();
+
+		// dispatch correct display mode
+		switch (cfg.renderViewport) {
+			case VIEWPORT.TYPE.MODE_FIXED:
+				SCREEN.ConsoleSetFixed ( cfg );
+				break;
+			case VIEWPORT.TYPE.MODE_SCALED:
+				SCREEN.ConsoleSetScaled ( cfg );
+				break;
+			case VIEWPORT.TYPE.MODE_FLUID:
+				SCREEN.ConsoleSetFluid ( cfg );
+				break;
+			default:
+				throw "mode "+cfg.renderViewport+" not implemented";
+		}			
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/
@@ -158,56 +281,31 @@ define ( [
 		return RENDERER.Viewport().WebGLCanvas();
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Call during CONSTRUCT phase, so INITIALIZE has had time to run
-/*/	SCREEN.CreateLayout = function ( cfg ) {
-
-		// check parameters
-		u_NormalizeConfig( cfg );
-		// add 'attachTo' parameter for RENDERER 
-		cfg.attachId = RENDERER_ID;	
-		// save configuration for later adjustment
-		m_cfg = cfg;
-
-		// handle mode setup
-		switch (cfg.screenLayout) {
-			case SCREEN.TYPE.MODE_NONE:
-				SCREEN.InitializeDefault( cfg );
-				break;
-			case SCREEN.TYPE.MODE_DESKTOP:
-				SCREEN.InitializeDesktopMode( cfg );
-				break;
-			case SCREEN.TYPE.MODE_APP:
-				SCREEN.InitializeAppMode( cfg );
-				break;
-			default:
-				throw "Unexpected screenLayout "+cfg.screenLayout;
-		}
-
-		// start renderer refresh
-		RENDERER.AutoRender();
-
-	}; 
-
-///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Renderer is in the upper left and doesn't change size
-/*/	SCREEN.SetFixedLayout = function ( cfg ) {
+/*/	SCREEN.SetFixed = function ( cfg ) {
 		console.log("SCREEN: setting fixed layout");
+		u_SetAbsoluteSize( SCREEN.Overlay, cfg );
+};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Renderer is in table layout in middle and doesn't change size
+/*/	SCREEN.ConsoleSetFixed = function ( cfg ) {
+		console.log("SCREEN: setting console fixed layout");
 		u_SetAbsoluteSize( SCREEN.Overlay, cfg );
 };
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	set position absolute to cfg dimensions
 /*/	function u_SetAbsoluteSize ( jsel, cfg ) {
-		jsel.css('width',cfg.renderWidth);
-		jsel.css('height',cfg.renderHeight);
+		jsel.width(cfg.renderWidth);
+		jsel.height(cfg.renderHeight);
 		jsel.css('position','absolute');
 		var dim = u_GetBrowserDimensions();
-		SCREEN.Info.css('width',cfg.renderWidth);
-		SCREEN.Debug.css('width',cfg.renderWidth);
+		SCREEN.Info.width(cfg.renderWidth);
+		SCREEN.Debug.width(cfg.renderWidth);
 
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ a scaled lout will size itself to fit within the available space
-/*/	SCREEN.SetScaledLayout = function ( cfg ) {
+/*/	SCREEN.SetScaled = function ( cfg ) {
 		// hide nfo and debug because this messes up dimensions
 		// until it's rewritten to take Debug and Info into account
 		SCREEN.Debug.hide();
@@ -215,43 +313,68 @@ define ( [
 		// resize viewport on browser resize after 250ms
 		$(window).resize(function () {
 			clearTimeout(m_resize_timer);
-			m_resize_timer = setTimeout(u_ScaleRendererToFit,500);
+			m_resize_timer = setTimeout(u_ScaleToFit,500);
 		});
-		u_ScaleRendererToFit();
+		u_ScaleToFit();
+	}; 
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ console layout version of SetScaled
+/*/	SCREEN.ConsoleSetScaled = function ( cfg ) {
+		// resize viewport on browser resize after 250ms
+		$(window).resize(function () {
+			clearTimeout(m_resize_timer);
+			m_resize_timer = setTimeout(u_ConsoleScaleToFit,500);
+		});
+		u_ConsoleScaleToFit();
 	}; 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	When scaling the renderer, we don't need to adjust any camera parameters
-/*/	function u_ScaleRendererToFit () {
+/*/	function u_ScaleToFit () {
 		var dim = u_GetBrowserDimensions();
-
 		var canvas = $(VIEWPORT.WebGLCanvas());
-		canvas.css('width',dim.scaledWidth);
-		canvas.css('height',dim.scaledHeight);
-		SCREEN.Overlay.css('width',dim.scaledWidth);
-		SCREEN.Overlay.css('height',dim.scaledHeight);
-		SCREEN.Main.css('width',dim.scaledWidth);
-		SCREEN.Main.css('height',dim.scaledHeight);
 
-		SCREEN.Debug.css('width',dim.scaledWidth);
+		canvas.width(dim.scaledWidth);
+		canvas.height(dim.scaledHeight);
+
+		SCREEN.Overlay.width(dim.scaledWidth);
+		SCREEN.Overlay.height(dim.scaledHeight);
+		SCREEN.Main.width(dim.scaledWidth);
+		SCREEN.Main.height(dim.scaledHeight);
+
+		SCREEN.Debug.width(dim.scaledWidth);
 		SCREEN.Debug.css('top',dim.boxBottom+'px');
 	}
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	When scaling the renderer, we don't need to adjust any camera parameters
+/*/	function u_ConsoleScaleToFit () {
+		var dim = u_GetLayoutDimensions();
+		var canvas = $(VIEWPORT.WebGLCanvas());
+
+		canvas.width(dim.scaledWidth);
+		canvas.height(dim.scaledHeight);
+
+		SCREEN.Overlay.width(dim.scaledWidth);
+		SCREEN.Overlay.height(dim.scaledHeight);
+		SCREEN.Main.width(dim.scaledWidth);
+		SCREEN.Main.height(dim.scaledHeight);
+	}
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	a fluid layout resizes itself to fill all available space
-/*/	SCREEN.SetFluidLayout = function ( cfg ) {
+/*/	SCREEN.SetFluid = function ( cfg ) {
 		// hide nfo and debug
 		SCREEN.Debug.hide();
 		SCREEN.Info.hide();
 		// resize viewport on browser resize after 250ms
 		$(window).resize(function () {
 			clearTimeout(m_resize_timer);
-			m_resize_timer = setTimeout(u_ResizeRendererToFit,250);
+			m_resize_timer = setTimeout(u_ResizeToFit,250);
 		});
-		u_ResizeRendererToFit();
+		u_ResizeToFit();
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	When resizing the renderer, we need to adjust camera parameters so 
 	the world is still drawn 1:1
-/*/	function u_ResizeRendererToFit () {
+/*/	function u_ResizeToFit () {
 		var dim = u_GetBrowserDimensions();
 
 		VIEWPORT.SetDimensions(dim.boxWidth, dim.boxHeight);
@@ -261,18 +384,19 @@ define ( [
 
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	function u_GetBrowserDimensions () {
+		var root = SCREEN.Root;
 		// get dimensions of the viewable area (no scrolling)
 		var screenHeight 	= $(window).height();
 		var displayWidth 	= $(document).width();
-		var displayHeight 	= screenHeight - m_root.offset().top;
+		var displayHeight 	= screenHeight - root.offset().top;
 
-		// take any space added to the #display container saved in m_root
-		var insetWidth = parseInt(m_root.css('margin-left'))+parseInt(m_root.css('margin-right'));
-		insetWidth += parseInt(m_root.css('padding-left'))+parseInt(m_root.css('padding-right'));
+		// take any space added to the #display container saved in root
+		var insetWidth = parseInt(root.css('margin-left'))+parseInt(root.css('margin-right'));
+		insetWidth += parseInt(root.css('padding-left'))+parseInt(root.css('padding-right'));
 		displayWidth = displayWidth - insetWidth;
 
-		var insetHeight = parseInt(m_root.css('margin-top'))+parseInt(m_root.css('margin-bottom'));
-		insetHeight += parseInt(m_root.css('padding-top'))+parseInt(m_root.css('padding-bottom'));
+		var insetHeight = parseInt(root.css('margin-top'))+parseInt(root.css('margin-bottom'));
+		insetHeight += parseInt(root.css('padding-top'))+parseInt(root.css('padding-bottom'));
 		displayHeight = displayHeight - insetHeight;
 
 		// calculate max size to fit current renderer
@@ -297,7 +421,31 @@ define ( [
 			scaledHeight 	: scaledHeight
 		};
 	}
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	function u_GetLayoutDimensions () {
 
+		// get elements
+		var lout = m_GetLayout();
+		var main = lout.main;
+
+		// get base dimensions
+		var dim = u_GetBrowserDimensions();
+
+		// adjust for current layout mode
+		var calcWidth = dim.boxWidth - lout.leftWidth - lout.rightWidth;
+		var calcHeight = dim.boxHeight - lout.topHeight - lout.bottomHeight;
+		var aspect = m_cfg.renderWidth / m_cfg.renderHeight;
+		var multiplier = Math.min(
+			calcWidth / m_cfg.renderWidth,
+			calcHeight / m_cfg.renderHeight
+		);
+		dim.scaledHeight = Math.floor(m_cfg.renderHeight * multiplier);
+		dim.scaledWidth = Math.floor(dim.scaledHeight * aspect);
+		dim.boxWidth = calcWidth;
+		dim.boxHeight = dim.scaledHeight;
+
+		return dim;
+	}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -360,12 +508,12 @@ define ( [
 		}
 		switch (cfg.screenLayout) {
 			case undefined:
-				cfg.screenLayout = SCREEN.TYPE.MODE_NONE;
+				cfg.screenLayout = SCREEN.T_NONE;
 				console.warn('SCREEN: no screenLayout defined; using default');
 				break;
-			case SCREEN.TYPE.MODE_NONE:
-			case SCREEN.TYPE.MODE_DESKTOP:
-			case SCREEN.TYPE.MODE_APP:
+			case SCREEN.T_NONE:
+			case SCREEN.T_CONSOLE:
+			case SCREEN.T_MOBILE:
 				break;
 			default:
 				throw "SCREEN: "+cfg.screenLayout+" is not a valid layout";
@@ -398,7 +546,35 @@ define ( [
 
 		return cfg;
 	}
-
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Retrieve a "layout object" that has dimensions of the various areas 
+	associated with each named layout. Returns current layout if no
+	layoutName is passed
+/*/	function m_GetLayout ( layoutName ) {
+		var lout;
+		if (layoutName) lout = m_layouts[layoutName];
+		else lout = m_layouts[mode_layout];
+		if (!lout) throw "invalid layout keystring: "+layoutName;
+		return lout;
+	}
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	function m_SaveLayout ( layoutName, lobj ) {
+		if (m_layouts[layoutName]) { }
+		m_layouts[layoutName] = lobj;
+	}
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	function m_DefineRoot () {
+		var id = ROOT_ID;
+		var root = document.getElementById(id);
+		if (!root) throw "SCREEN requires div #"+id,"element";
+		// define main areas
+		root = $(root);
+		if (root.children().length) {
+			console.warn('SCREEN is erasing existing children of div#'+id);
+		}
+		root.empty();
+		return root;
+	}
 
 ///////////////////////////////////////////////////////////////////////////////
 /** RETURN MODULE ************************************************************/
