@@ -748,7 +748,7 @@ define ( [
 	function m_DefineRoot () {
 		var id = ROOT_ID;
 		var root = document.getElementById(id);
-		if (!root) throw "SCREEN requires div #"+id,"element";
+		if (!root) throw "SCREEN requires div #"+id+" element";
 		// define main areas
 		root = $(root);
 		if (root.children().length) {
