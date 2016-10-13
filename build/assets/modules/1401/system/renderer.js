@@ -271,7 +271,7 @@ define ([
 		if (BG_SPRITE) {
 			return BG_SPRITE;
 		} else {
-			console.error('No background set');
+			console.warn('CurrentBackground: no bg sprite is set');
 			return undefined;
 		}
 	};
