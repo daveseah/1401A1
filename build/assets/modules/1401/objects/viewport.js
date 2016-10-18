@@ -177,6 +177,7 @@ define ([
 		this.worldUp = new THREE.Vector3(0,1,0);	// y-axis is up, camera looks on XY
 		this.worldUnits = worldUnits;
 		this.worldScale = Math.max(worldUnits/this.width,worldUnits/this.height);
+		this.worldAspect = this.width/this.height;
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// Step 3. Create all the cameras
@@ -186,6 +187,7 @@ define ([
 		}
 		var hw = this.width/2;
 		var hh = this.height/2;
+		this.worldAspect = hw/hh;
 		this.camBG = new THREE.OrthographicCamera(-hw,hw,hh,-hh,0,1000);
 		this.camSCREEN = new THREE.OrthographicCamera(-hw,hw,hh,-hh,0,1000);
 		var whw = this.width * this.worldScale / 2;
@@ -233,6 +235,8 @@ define ([
 		if (!(width && height && this.webGL)) {
 			console.error("ViewPort requires valid width and height. Did you InitializeRenderer()?");
 		}
+		this.aspect = this.width/this.height;
+		this.worldAspect = this.aspect;
 
 		// save values
 		this.width 	= width;
@@ -257,7 +261,16 @@ define ([
 		}
 		return { 
 			width: this.width,
-			height: this.height
+			height: this.height,
+			aspect: this.aspect
+		};
+	});
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	Viewport.method('WorldDimensions', function () {
+		return {
+			worldUnits 	: this.worldUnits,
+			worldScale 	: this.worldScale,
+			worldAspect	: this.worldAspect
 		};
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -377,9 +390,9 @@ define ([
 	// calculates how far a 3D camera with a particular
 	// FOV needs to move back to show fWidth and fHeight
 	// pixels. Used to frame a particular number of world units
-	function m_GetFramingDistance ( cam3D, fWidth, fHeight ) {
+	function m_GetFramingDistance ( cam3D, fWidth, fHeight, safety ) {
 
-		var safety = 0.5;
+		safety = safety || 0.5;
 		var buffer = fWidth * safety;
 
 		fWidth += buffer;
