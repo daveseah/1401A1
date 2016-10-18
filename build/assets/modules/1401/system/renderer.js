@@ -323,9 +323,8 @@ define ([
 		// normalize to -1 to 1
 		// this appears to be threejs convention, though our coordinates in the world
 		var dim = VIEWPORT.Dimensions();
-		var units = VIEWPORT.WorldDimensions().worldUnits;
-		var x =  ((event.pageX-offset.left) / dim.scaledWidth) * 2 - 1;
-		var y = -((event.pageY-offset.top) / dim.scaledHeight) * 2 - 1;
+		var x =  (((event.pageX-offset.left) / dim.scaledWidth)-0.5)*2;
+		var y = -(((event.pageY-offset.top) / dim.scaledHeight)-0.5)*2;
 		var vector = new THREE.Vector3(x, y, -1);
 
 		// current camera, objects
