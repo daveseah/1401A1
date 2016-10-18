@@ -260,9 +260,11 @@ define ([
 			return;
 		}
 		return { 
-			width: this.width,
-			height: this.height,
-			aspect: this.aspect
+			width 			: this.width,
+			height 			: this.height,
+			aspect 			: this.aspect,
+			scaledWidth 	: this.$container.width(),
+			scaledHeight 	: this.$container.height()
 		};
 	});
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
