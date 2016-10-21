@@ -170,7 +170,7 @@ define ( [
 		var lobj = {
 			// top header
 			top 			: null,
-			topHeight 		: cfg.topHeight || cfg.topHeight===0 ? 0 : 80,
+			topHeight 		: (cfg.topHeight===0) ? 0 : cfg.topHeight || 80,
 			// middle table and table row
 			middle 			: null,
 			midrow 			: null,
@@ -178,13 +178,13 @@ define ( [
 			main 			: null,
 			// left sidebar
 			left 			: null,
-			leftWidth 		: cfg.leftWidth || cfg.leftWidth===0 ? 0 : 160,
+			leftWidth 		: (cfg.leftWidth===0) ? 0 : cfg.leftWidth || 160,
 			// right sidebar
 			right 			: null,
-			rightWidth 		: cfg.rightWidth || cfg.rightWidth===0 ? 0 : 160,
+			rightWidth 		: (cfg.rightWidth===0) ? 0 : cfg.rightWidth || 160,
 			// bottom footer
 			bottom 			: null,
-			bottomHeight	: cfg.bottomHeight || cfg.bottomHeight===0 ? 0 : 80
+			bottomHeight	: (cfg.bottomHeight===0) ? 0 : cfg.bottomHeight || 80
 			// visibility flags
 		};
 
@@ -680,7 +680,9 @@ define ( [
 		// check for legal modes
 		switch (cfg.renderViewport) {
 			case undefined:
-				throw 'SCREEN: config object missing renderViewport property';
+				cfg.renderViewport = VIEWPORT.TYPE.MODE_FIXED;
+				console.warn('SCREEN: no renderViewport defined; used MODE_FIXED');
+				break;
 			case VIEWPORT.TYPE.MODE_FIXED:
 			case VIEWPORT.TYPE.MODE_SCALED:
 			case VIEWPORT.TYPE.MODE_FLUID:
