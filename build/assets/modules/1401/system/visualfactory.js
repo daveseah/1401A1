@@ -100,7 +100,7 @@ define ([
 			var hh = DEFAULT_SPR_TEXTURE.image.height;
 			spr.SetScaleXYZ(ww,hh,1);
 			// save in update array
-			this.RegisterHeartBeatVisual(spr);
+			API.RegisterHeartBeatVisual(spr);
 		} else {
 			console.error("DEFAULT_SPR_TEXTURE is undefined");
 		}
@@ -127,7 +127,7 @@ define ([
 
 		var threeSprite = new InqSprite (mat);
 		// save in update array
-		this.RegisterHeartBeatVisual(threeSprite);
+		API.RegisterHeartBeatVisual(threeSprite);
 
 		console.assert(threeSprite, "could not create THREE.Sprite");
 
