@@ -28,6 +28,7 @@
 
 	// for managing the 1401 server node process
 	var spawn 		= require('child_process').spawn;
+	var exec 		= require('child_process').exec;
 	var server1401;
 
 	// for handling livereload
@@ -173,8 +174,11 @@
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Default
-/*/	gulp.task('default', ['build'], function () {
-		runServer();
+/*/	gulp.task('default', function () {
+		runseq (
+			'build',
+			'server'
+		);
 	});
 
 
@@ -187,35 +191,8 @@
 		config = cfg || {};
 		config.debug = config.debug || false;
 
-		// spawn livereload configuration w/ default config
-		LR.startLiveReload();
 		// spawn the process!
 		spawnProcess( config );
-
-		// If changing watch path, make sure to change copy paths in tasks
-		// Requires LiveReload browser extension installed in browser
-		// and it must enabled AND connected.
-		gulp.watch(ASSETS+'modules/**', function ( event ) {
-			runseq (
-				['copy-assets'],
-				function () { LR.notifyLiveReload( event ); }
-			);
-		});
-
-		// handle changes to server files
-		gulp.watch([SERVER+'**/**.js',SERVER+'**/**.hbs'], function ( event ) {
-			var delay = 1500;
-			kill1401server();
-			console.log(DBGP,'SERVER  reload in',delay,'ms...');
-			if (restart_timeout) clearTimeout(restart_timeout);
-			restart_timeout = setTimeout( function() {
-				spawnProcess();
-				console.log(DBGP,'BROWSER reload in',delay,'ms...');
-				setTimeout( function () {
-					LR.reloadAll();
-				}, delay);
-			}, delay);
-		});
 	}
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ spawn the process based on the stored config parameters
@@ -228,26 +205,68 @@
 			args.push('-c');
 			console.log( DBGP,'RUNNING IN NODE DEBUG MODE' );
 		}
-		args.push('./server/1401.js');
+		var script = './server/1401.js';
+		args.push(script);
 		var opt = {
 			env: process.env,
 			detached: true
 		};
 
-		// fork the 1401 process
-		server1401 = spawn( progname, args, opt, 
-			function( err, stdout, stderr ) {
-				console.log('callback from spawn');
-				if (err) console.log(err);
-				if (stdout) console.log(stdout);
-				if (stderr) console.log(stderr);
-			}
-		);
-		// redirect child stdout so we can see it more as it happens
-		server1401.stdout.pipe(process.stdout);
-		server1401.stderr.pipe(process.stderr);
-	}
+		// check for running 1401 process
+		var check = progname+' '+script;
+		exec('pgrep -f "'+check+'"', function (err,stdout,stdin) {
+			if (stdout) {
+				console.log("\n!!! 1401 SERVER IS ALREADY RUNNING !!!");
+				console.log("    Is it running in another terminal window?");
+				console.log("    Use control-c to terminate it.\n");
+				console.log("    If server has crashed, use 'pgrep -f 1401.js' to find the PID number");
+				console.log("    then use 'kill -9 <PID number>' to force termination.\n");
+				// exec('pkill '+stdout, function(err,stdout,stdin) {});
+			} else {
+				// fork the 1401 process
+				server1401 = spawn( progname, args, opt, 
+					function( err, stdout, stderr ) {
+						console.log('callback from spawn');
+						if (err) console.log(err);
+						if (stdout) console.log(stdout);
+						if (stderr) console.log(stderr);
+					}
+				);
+				// redirect child stdout so we can see it more as it happens
+				server1401.stdout.pipe(process.stdout);
+				server1401.stderr.pipe(process.stderr);
 
+				// start livereload
+				// spawn livereload configuration w/ default config
+				LR.startLiveReload();
+
+				// If changing watch path, make sure to change copy paths in tasks
+				// Requires LiveReload browser extension installed in browser
+				// and it must enabled AND connected.
+				gulp.watch(ASSETS+'modules/**', function ( event ) {
+					runseq (
+						['copy-assets'],
+						function () { LR.notifyLiveReload( event ); }
+					);
+				});
+
+				// handle changes to server files
+				gulp.watch([SERVER+'**/**.js',SERVER+'**/**.hbs'], function ( event ) {
+					var delay = 1500;
+					kill1401server();
+					console.log(DBGP,'SERVER  reload in',delay,'ms...');
+					if (restart_timeout) clearTimeout(restart_timeout);
+					restart_timeout = setTimeout( function() {
+						spawnProcess();
+						console.log(DBGP,'BROWSER reload in',delay,'ms...');
+						setTimeout( function () {
+							LR.reloadAll();
+						}, delay);
+					}, delay);
+				});
+			}
+		});
+	}
 
 
 ///	PROCESS CONTROL ///////////////////////////////////////////////////////////
