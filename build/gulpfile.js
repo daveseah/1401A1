@@ -253,19 +253,24 @@
 				// handle changes to server files
 				gulp.watch([SERVER+'**/**.js',SERVER+'**/**.hbs'], function ( event ) {
 					var delay = 1500;
+
 					kill1401server();
-					console.log(DBGP,'SERVER  reload in',delay,'ms...');
+
 					if (restart_timeout) clearTimeout(restart_timeout);
+					else console.log(DBGP,'SERVER  reload in',delay,'ms...');
+
 					restart_timeout = setTimeout( function() {
 						spawnProcess();
 						console.log(DBGP,'BROWSER reload in',delay,'ms...');
 						setTimeout( function () {
 							LR.reloadAll();
+							restart_timeout = null;
 						}, delay);
 					}, delay);
 				});
-			}
-		});
+				
+			} // else stdout
+		}); // exec callback
 	}
 
 
