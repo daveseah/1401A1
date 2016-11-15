@@ -3,7 +3,6 @@ SYS1401.AddModulePath( '1401', '1401' );
 SYS1401.AddModulePath( '1401-games', '1401-games');
 SYS1401.AddModulePath( 'yaml', 'vendor/yaml.js/yaml','YAML' );
 SYS1401.AddModulePath( 'three', 'vendor-extra/three.min','THREE' );
-SYS1401.AddModulePath( 'physicsjs', 'vendor/physicsjs/physicsjs-full.min' );
 
 define ([
 	'plugins/router',

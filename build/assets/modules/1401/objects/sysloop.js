@@ -432,6 +432,10 @@ define ([
 		m_master_gameloop.GetInput(ms);
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	FACTORY.PhysicsUpdate = function ( ms ) {
+		PIECEFACTORY.PhysicsStep( ms );
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	FACTORY.ModulesUpdate = function ( ms ) {
 		arr = m_LoopsArray();
 		for (i=0;i<arr.length;i++) {

@@ -32,11 +32,16 @@ define ([
 
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	API.HeartBeat = function ( interval_ms ) {
-		// do piece management, garbage collection if necessary
+		// no global piecefactory heartbeat functions...yet
+	};
+/// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	API.PhysicsStep = function ( interval_ms ) {
+		// tell moving piece to simstep if physics needed
+		// THIS IS SUPER HACKY, and needs REFACTORING
+		// for a cleaner physics system
 		physics_time += interval_ms;
 		MovingPiece.WorldStep( physics_time );
 	};
-
 
 ///	STEP INTERFACES //////////////////////////////////////////////////////////
 

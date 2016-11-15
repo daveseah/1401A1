@@ -1,7 +1,6 @@
 /* demo/test/011-webrtc-mirror.js */
 define ([
 	'keypress',
-	'physicsjs',
 	'howler',
 	'1401/objects/sysloop',
 	'1401/settings',
@@ -10,10 +9,9 @@ define ([
 	'1401/system/visualfactory',
 	'1401/system/piecefactory',
 	'1401-games/demo/modules/controls',
-	SYS1401.LocalPath('tests/lib/webrtc')
+	SYS1401.LocalPath('game-modes/lib/webrtc')
 ], function ( 
 	KEY,
-	PHYSICS,
 	HOWLER,
 	SYSLOOP,
 	SETTINGS,

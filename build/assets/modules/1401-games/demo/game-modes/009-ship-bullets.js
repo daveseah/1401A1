@@ -1,7 +1,6 @@
 /* demo/test/009-ship-controls.js */
 define ([
 	'keypress',
-	'physicsjs',
 	'howler',
 	'1401/objects/sysloop',
 	'1401/settings',
@@ -12,7 +11,6 @@ define ([
 	'1401-games/demo/modules/controls'
 ], function ( 
 	KEY,
-	PHYSICS,
 	HOWLER,
 	SYSLOOP,
 	SETTINGS,

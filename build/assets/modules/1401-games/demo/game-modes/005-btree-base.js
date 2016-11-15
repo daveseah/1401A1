@@ -1,7 +1,6 @@
 /* demo/test/005.js */
 define ([
 	'keypress',
-	'physicsjs',
 	'1401/objects/sysloop',
 	'1401/settings',
 	'1401/system/renderer',
@@ -12,7 +11,6 @@ define ([
 	'1401-games/demo/modules/ai'
 ], function (
 	KEY,
-	PHYSICS,
 	SYSLOOP,
 	SETTINGS,
 	RENDERER,

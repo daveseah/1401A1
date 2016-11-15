@@ -1,24 +1,26 @@
 // add additional special modules used by this game //
 SYS1401.AddModulePath( 'keypress', 'vendor/Keypress/keypress-2.1.3.min' );
-// SYS1401.UpdateModulePaths(); // call after all AddModulePath() made
 SYS1401.AddModulePath( 'howler', 'vendor/howler/howler' );
-// SYS1401.UpdateModulePaths(); // call after all AddModulePath() made
 SYS1401.AddModulePath( 'webrtc-shim', 'vendor/webrtc-adapter/adapter' );
-// SYS1401.UpdateModulePaths(); // call after all AddModulePath() made
 SYS1401.AddModulePath( 'socket-io', 'vendor-extra/socket.io' );
-// SYS1401.UpdateModulePaths(); // call after all AddModulePath() made
-
-// you need to call this after using AddModulePath once!
 SYS1401.UpdateModulePaths();
-
 define ([
 	'1401/system/debug',
 	'1401/settings',
 	'1401/objects/sysloop',
 	'1401/system/renderer',
 	'1401/system/screen',
+//	SYS1401.LocalPath(SYS1401.GameMode('001-gameloop')),
+//	SYS1401.LocalPath(SYS1401.GameMode('002-stars-finite')),
+//	SYS1401.LocalPath(SYS1401.GameMode('003-stars-infinite')),
+//	SYS1401.LocalPath(SYS1401.GameMode('004-ship-movement')),
+//	SYS1401.LocalPath(SYS1401.GameMode('005-btree-base')),
+//	SYS1401.LocalPath(SYS1401.GameMode('006-btree-factory')),
+//	SYS1401.LocalPath(SYS1401.GameMode('007-loadassets')),
+//	SYS1401.LocalPath(SYS1401.GameMode('008-timer')),
 	SYS1401.LocalPath(SYS1401.GameMode('009-ship-bullets')),
 //	SYS1401.LocalPath(SYS1401.GameMode('010-screen')),
+//	SYS1401.LocalPath(SYS1401.GameMode('011-webrtc-mirror')),
 	'webrtc-shim' // required for 011-webrtc-mirror
 ], function ( 
 	DBG,
@@ -77,10 +79,10 @@ define ([
 	Note 2: Pieces are updated individually here too. Order is important.
 /*/	function API_GameStep ( ms ) {
 
-		/* game pause control */
-		/* game logic */
+		/* insert game pause control here */
+		/* insert game logic call here */
 		SYSLOOP.GetInputAll(ms);
-		/* physics step in autosys */
+		SYSLOOP.PhysicsUpdate(ms);		// SPECIAL PHYSICS UPDATE
 		SYSLOOP.PiecesUpdate (ms);		// all pieces update
 		SYSLOOP.ModulesUpdate (ms);		// modules update (us included)
 		SYSLOOP.ModulesThink (ms);		// modules AI think (us included)
@@ -88,8 +90,8 @@ define ([
 		SYSLOOP.ModulesOverThink (ms);	// modules AI override (us included)
 		SYSLOOP.PiecesExecute (ms);		// all pieces execute
 		SYSLOOP.ModulesExecute (ms);	// modules AI execute (us included)
-		/* ui updates */
-		/* game level management */
+		/* insert ui updates here */
+		/* insert game level management */
 
 	}
 

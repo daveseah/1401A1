@@ -1,3 +1,4 @@
+SYS1401.AddModulePath( 'physicsjs', 'vendor/physicsjs/physicsjs-full' );
 /* movingpiece.js */
 define ([
 	'three',

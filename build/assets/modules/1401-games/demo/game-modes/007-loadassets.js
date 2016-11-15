@@ -1,7 +1,6 @@
 /* demo/test/007.js */
 define ([
 	'keypress',
-	'physicsjs',
 	'1401/objects/sysloop',
 	'1401/settings',
 	'1401/system/renderer',
@@ -10,7 +9,6 @@ define ([
 	'1401/objects/logic/checkinmonitor'
 ], function (
 	KEY,
-	PHYSICS,
 	SYSLOOP,
 	SETTINGS,
 	RENDERER,
