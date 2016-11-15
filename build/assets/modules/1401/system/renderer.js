@@ -277,6 +277,18 @@ define ([
 	};
 
 
+///	RETURN RENDERPASSES //////////////////////////////////////////////////////
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	API.RenderPasses = function () {
+		return {
+			RP_BG 		: RP_BG,
+			RP_WORLD 	: RP_WORLD,
+			RP_WORLD2 	: RP_WORLD2,
+			RP_UI 		: RP_UI,
+			RP_OVER 	: RP_OVER
+		};
+	};
+
 
 /// RAYCASTING CLICK SUPPORT///////////////////////////////////////////////////
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
