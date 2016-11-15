@@ -102,7 +102,7 @@ define ([
 			// save in update array
 			API.RegisterHeartBeatVisual(spr);
 		} else {
-			console.error("DEFAULT_SPR_TEXTURE is undefined");
+			console.error("MakeDefaultSprite: Do not call before SYSLOOP.Construct");
 		}
 		return spr;	
 	};
