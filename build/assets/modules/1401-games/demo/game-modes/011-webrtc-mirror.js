@@ -2,6 +2,7 @@
 define ([
 	'keypress',
 	'howler',
+	'physicsjs',
 	'1401/objects/sysloop',
 	'1401/settings',
 	'1401/system/renderer',
@@ -13,6 +14,7 @@ define ([
 ], function ( 
 	KEY,
 	HOWLER,
+	PHYSICS,
 	SYSLOOP,
 	SETTINGS,
 	RENDERER,
