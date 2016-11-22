@@ -79,8 +79,31 @@ define ([
 	var cmd, frame, bm;
 
 
+///	OVERRIDE METHODS ////////////////////////////////////////////////////////
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	var _super = {};
+	_super.toJSON = THREE.Sprite.prototype.toJSON;
+	_super.clone = THREE.Sprite.prototype.clone;
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	InqSprite.method('toJSON', function () {
+		var json = _super.toJSON.call(this);
+		json.ex1401 = {
+			type: 'inqsprite',
+			properties: {
+				sequences: this.sequences,
+				seqRateTimer: this.seqRateTimer,
+				seqRuns: this.seqRuns,
+				seq: this.seq,
+				fractionalWidth: this.fractionalWidth,
+				fractionalHeight: this.fractionalHeight,
+				zoom: this.zoom
+			}
+		};
+		return json;
+	});
+
 ///	METHODS /////////////////////////////////////////////////////////////////
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	InqSprite.method('Update', function ( ms ) {
 		// private updateFunction for certain kinds of animation support
 		override = false;
@@ -98,7 +121,7 @@ define ([
 		}
 	});
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Shows next frame of the current sequence based on elapsed time.
 /*/	InqSprite.method('PRI_UpdateSequence', function ( ms ) {
 		if (this.seqMode==InqSprite.RUN_COMPLETE) return;
@@ -131,7 +154,7 @@ define ([
 				this.PRI_ShowSequenceFrame(seq);
 		}
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	handles pulse behavior
 	pulseStart, pulseEnd, pulseDuration, pulseDirection
 /*/	InqSprite.method('PRI_UpdatePulse', function ( ms ) {
@@ -154,7 +177,7 @@ define ([
 			}
 		}
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ texturePath is relative to root of public directory, which contains /javascript
 	folder.
 /*/	InqSprite.method('SetTexture', function ( texturePath, onValid ) {
@@ -198,18 +221,18 @@ define ([
 
 	});
 
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ to rotate a sprite, you need to rotate its material, not its visual
 	rotation property.
 /*/	InqSprite.method('Rotate', function ( rot ) {
 		this.material.rotation = rot;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	return true if material loaded
 /*/	InqSprite.method('TextureIsLoaded', function () {
 		return this.material.map.image!==undefined;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	return size of sprite texture (material) if it's been loaded yet,
 	undefined if invalid
 /*/	InqSprite.method('TextureDimensions', function () {
@@ -223,7 +246,7 @@ define ([
 			return undefined;
 		}
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	return size of sprite (taking spritesheet into account) if it's valid,
 	undefined if invalid
 /*/	InqSprite.method('SpriteDimensions', function () {
@@ -239,21 +262,21 @@ define ([
 			return undefined;
 		}
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	This is a ThreeJS-specific non-uniform scale setter. It's used to size
 	a sprite exactly to the size it should be. Z is not scaled.
 /*/	InqSprite.method('SetScaleXYZ', function ( x,y,z ) {
 		var s = this.zoom;
 		this.scale.set(s*x,s*y,z); // for threeJS scaling, which we are controlling
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*	This will return the current scale of the sprite, which might not be what
 	you want. Use TextureDimensions() and SpriteDimensions() to get the 
 	native size of the sprite texture (spritesheet) or sprite base dimensions.
 /*/	InqSprite.method('ScaleXYZ', function () {
 		return { x: scale.x, y: scale.y, z: scale.z }; // for threeJS scaling
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	This is a universal scaling factor, separate from ScaleXYZ, for relative
 	sizing of sprites (think of it as a zoom)
 /*/	InqSprite.method('SetZoom', function ( s ) {
@@ -267,15 +290,15 @@ define ([
 			if (DBGOUT) console.warn("Called SetZoom("+this.zoom+") before texture loaded. Deferring operation");
 		}
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	InqSprite.method('Zoom', function ( s ) {
 		return this.zoom;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	InqSprite.method('Show', function () {
 		this.visible = true;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	InqSprite.method('Hide', function () {
 		this.visible = false;
 	});
@@ -294,7 +317,12 @@ define ([
 	create 'named sequences' of sprite frames. The graphics pathname 
 	should be arranged as a spritesheet grid. The specification is:
 	{
+		DIVIDE SPRITESHEET BY ROWS/COLS
 		grid: { rows: <int>, columns: <int>, stacked:<bool> },
+		- or - 
+		USE CELLS OF SIZE WIDTHxHEIGHT
+		grid: { width: <int>, height: <int>, stacked:<bool> },
+
 		sequences: [
 			{ name: <string>, framecount: <int>, fps: <int> }
 			...
@@ -307,15 +335,24 @@ define ([
 
 		var that = this;
 
+		var grid = spec.grid;
+		if (!grid) throw "DefineSequences: requires spec.grid object";
 	//  validate grid property
-		var grid = spec.grid&&spec.grid.rows&&spec.grid.columns;
-		grid = grid && (typeof spec.grid.rows=='number');
-		grid = grid && (typeof spec.grid.columns=='number');
-		if (grid) {
-			grid = spec.grid;
-		} else {
-			console.warn("DefineSequences: spec.grid is bad");
-			return;
+		if (grid.width && grid.height) {
+			// this is a block-style definition
+			// validate numbers
+			if (typeof grid.width!=='number') throw "DefineSequences: width must be integer";
+			if (typeof grid.height!=='number') throw "DefineSequences: height must be integer";
+			grid.type = 'block';
+		} 
+		if (grid.columns && grid.rows) {
+			// this is a partition grid definition
+			// validate that we haven't already set the 'block' 
+			if (grid.type==='block') throw "DefineSequences: columns/rows invalid when using width/height";
+			if (typeof spec.grid.rows!=='number') throw "DefineSequences: rows must be integer";
+			if (typeof spec.grid.columns!=='number') throw "DefineSequences: columns must be integer";
+			// check for valid texture size later
+			grid.type = 'grid';			
 		}
 	//  validate sequences property
 		var seqs = spec.sequences && spec.sequences.length;
@@ -323,7 +360,7 @@ define ([
 		if (seqs) {
 			seqs = spec.sequences;
 		} else {
-			console.warn("DefineSequences: spec.sequences is bad");
+			console.error("DefineSequences: spec.sequences is bad");
 			return;
 		}
 	//  validate sequences property
@@ -333,8 +370,31 @@ define ([
 		function ContinueDefineSequences (texture) {
 
 			var index = 0;
-			var fracWidth = 1 / grid.columns;
-			var fracHeight = 1 / grid.rows;
+			var fracWidth, fracHeight;
+			switch (grid.type) {
+				case 'block':
+					grid.columns 	= Math.floor(texture.image.width / grid.width);
+					grid.rows 		= Math.floor(texture.image.height / grid.height);
+					if (DBGOUT) console.log('BLOCK MODE: fitted cell grid',grid.columns+'x'+grid.rows);
+					fracWidth 		= grid.width / texture.image.width;
+					fracHeight 		= grid.height / texture.image.height;
+					if (DBGOUT) console.log('BLOCK MODE: frac cell dim',fracWidth.toFixed(3)+'x'+fracHeight.toFixed(3));
+					break;
+				case 'grid':
+					// grid.columns and grid.rows already defined by spec
+					// test width
+					fracWidth  		= 1 / grid.columns;
+					if ((texture.image.width % grid.columns)!==0)
+						throw "DefineSequences: width of texture should be evenly divisible by columns";
+					// test height
+					fracHeight 		= 1 / grid.rows;
+
+					if ((texture.image.height % grid.rows)!==0)
+						throw "DefineSequences: height of texture should be evenly divisible by rows";
+					break;
+				default: 
+					throw "DefineSequences: unexpected grid type!"+grid;
+			}
 
 			// now iterate over each sequence
 			for (var i=0;i<seqs.length;i++) {
@@ -349,7 +409,7 @@ define ([
 
 				str2 += "SEQ "+name.bracket();
 				if (grid.stacked) {
-					str2+=" stacked";
+					str2+=" stacked "+grid.type;
 					var mod = index % grid.columns;
 					if (mod) index += grid.columns - mod;
 					console.assert(index < (grid.rows * grid.columns),"index out of range");
@@ -373,8 +433,10 @@ define ([
 					var fobj = {
 						fw:     fracWidth,
 						fh:     fracHeight,
-						offx:   (index % grid.columns) / grid.columns,
-						offy:   1 - (1/grid.rows) - (Math.floor(index / grid.columns) / grid.rows)
+//						offx:   (index % grid.columns) / grid.columns,
+						offx:   (index % grid.columns) * fracWidth,	// left
+//						offy:   1 - (1/grid.rows) - (Math.floor(index / grid.columns) / grid.rows)
+						offy:   1 - (Math.floor(index / grid.columns) * fracHeight) - fracHeight
 					};
 					sobj.frames.push(fobj);
 					str3 = '('+fobj.offx.toFixed(3)+', ';
@@ -404,7 +466,7 @@ define ([
 		} // end of ContinuingFunction
 
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	PlaySequence() starts to play the sequence at the designated seqName +
 	offset, if one is defined.
 /*/	InqSprite.method('PlaySequence', function ( seqName, runs ) {
@@ -428,7 +490,7 @@ define ([
 		this.PRI_ShowSequenceFrame(seq);
 		// RUN_LAST will be set by update loop
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	GoSequence() loads the sequence, with an optional offset, and then
 //  stops.
 /*/	InqSprite.method('GoSequence', function ( seqName, offset ) {
@@ -468,7 +530,7 @@ define ([
 		// set completed
 		this.seqMode = InqSprite.RUN_LAST;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Advance the current sequence by one frame.
 /*/	InqSprite.method('IncrementSequence', function () {
 		this.seq.index++;
@@ -476,13 +538,13 @@ define ([
 			this.seq.index = 0;
 	});
 /*/	Back-up the current sequence by one frame.
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	InqSprite.method('DecrementSequence', function () {
 		this.seq.index--;
 		if (this.seq.index<0) 
 			this.seq.index = this.seq.frames.length-1;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Check to see if Sequence is done playing
 /*/	InqSprite.method('SequenceIsPlaying', function ( seqName ) {
 		isPlaying = this.seqRuns !== InqSprite.MODE_STOPPED;
@@ -492,50 +554,50 @@ define ([
 		}
 		return (isPlaying && isSequenceMatch);
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Return TRUE if on last frame of sequence
 /*/	InqSprite.method('SequenceIsLastFrame', function () {
 		return (this.seq.index==this.seq.frames.length-1);
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Return TRUE if the complete repeated run has completed in full.
 	Which is not the same as checking if MODE_STOPPED is true, which
 	is a form of pause control (weird pause control, though)
 /*/	InqSprite.method('SequenceIsRunComplete', function () {
 		return (this.seqMode==InqSprite.RUN_COMPLETE);
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	InqSprite.method('SequenceIsRunPlaying', function () {
 		return (this.seqMode==InqSprite.RUN_PLAYING);
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Return Sequence Run Remaining (-1 = infinite)
 /*/	InqSprite.method('SequenceRunsRemaining', function ( seqName ) {
 		return this.seqRuns;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Return Sequence Frame Count
 /*/	InqSprite.method('SequenceFrameCount', function ( seqName ) {
 		seq = this.PRI_GetSequence(seqName);
 		return seq.frames.length;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Return current sequence name
 /*/	InqSprite.method('SequenceCurrentName', function () {
 		return this.seq.name;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Return current frame index 
 /*/	InqSprite.method('SequenceCurrentIndex', function () {
 		return this.seq.index;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	PRIVATE utility to return current sequence or named sequence 
 /*/	InqSprite.method('PRI_GetSequence', function ( seqName ) {
 		// if seqName null, then return current sequence (default case)
 		return (seqName===undefined) ? this.seq : this.sequences[seqName];
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	PRIVATE: show current frame of the passed sequence object
 /*/	InqSprite.method('PRI_ShowSequenceFrame', function ( seq ) { 
 		frame = seq.frames[seq.index];
@@ -548,7 +610,7 @@ define ([
 			console.error("Invalid image ");
 		}
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Sets current sequence and initializes in default STOPPED state
 /*/	InqSprite.method('PRI_SetSequence', function ( seq, runs ) {
 		runs = runs || InqSprite.MODE_STOPPED;
@@ -556,7 +618,7 @@ define ([
 		this.seqRateTimer = seq.rate;
 		this.seq = seq;
 	});
-//	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	If PlaySequence() or GoSequence() is called while DefineSequence() is
 	still loading, it is queued and checked in SetTexture()'s success func
 /*/	InqSprite.method('PRI_CheckSequenceQueue', function () {
