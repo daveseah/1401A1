@@ -169,8 +169,8 @@ define ([
 /*/	function m_DebugOut ( msg, escape_msg, selector ) {
 		selector = selector || SCREEN.Debug;
 		var $dbg = $(selector);
-		if (Object.prototype.toString.call(e)==='[object Array]') {
-			$dbg = e[0];		// get first matching element
+		if (Object.prototype.toString.call($dbg)==='[object Array]') {
+			$dbg = $dbg[0];		// get first matching element
 		}
 		if (escape_msg) {
 			var e = document.createElement('div');
