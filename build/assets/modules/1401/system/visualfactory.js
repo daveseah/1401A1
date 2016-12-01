@@ -304,7 +304,7 @@ define ([
 		mat.blendSrc = THREE.OneMinusDstColorFactor;
 		mat.blendDst = THREE.OneFactor;
 
-		needsUpdate = true;
+		mat.needsUpdate = true;
 
 		return mesh;
 	};
