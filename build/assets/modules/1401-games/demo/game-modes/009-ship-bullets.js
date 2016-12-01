@@ -128,7 +128,7 @@ define ([
 			// add extra shooting command
 			crixa.Shoot = function ( bool ) {
 				if (bool) {
-					// snd_pewpew.play();
+					snd_pewpew.play();
 					console.log(this.name,"shoot bullet");
 					// create a new bullet 
 					var bp = PIECEFACTORY.NewMovingPiece();
@@ -200,7 +200,7 @@ define ([
 
 			// load sound
 			var sfx = SETTINGS.AssetPath('../demo/resources/pewpew.ogg');
-			snd_pewpew = new Howl({
+			snd_pewpew = new HOWLER.Howl({
 				urls: [sfx]
 			});
 

@@ -106,7 +106,7 @@ define ([
 		};
 		shipSprite.DefineSequences(SETTINGS.AssetPath('../demo/resources/crixa.png'),seq);
 		// shipSprite.PlaySequence("flicker");
-		crixa = PIECEFACTORY.NewMovingPiece("crixa");
+		var crixa = PIECEFACTORY.NewMovingPiece("crixa");
 		crixa.SetVisual(shipSprite);
 		crixa.SetPositionXYZ(0,0,0);
 	}

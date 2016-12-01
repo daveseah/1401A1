@@ -209,7 +209,7 @@ define ([
 
 			// load sound
 			var sfx = SETTINGS.AssetPath('../demo/resources/pewpew.ogg');
-			snd_pewpew = new Howl({
+			snd_pewpew = new HOWLER.Howl({
 				urls: [sfx]
 			});
 

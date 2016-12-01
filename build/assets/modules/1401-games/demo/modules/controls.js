@@ -27,9 +27,6 @@ define ([
 		fireReady: 		true
 	};
 
-	m_fireready = true;
-
-
 	// default values
 	var DEFAULT_ACC 		= 0.001;	// units per second^2
 	var DEFAULT_ROTACC 		= 0.0001;	// radians per second^2

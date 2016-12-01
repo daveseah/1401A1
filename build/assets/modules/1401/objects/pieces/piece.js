@@ -157,7 +157,7 @@ define ([
 /*/	Piece.method('SetRotation', function ( vector3 ) {	
 		if (vector3===undefined) console.error("rotation vector is undefined");
 		if (typeof vector3!=='object') console.error('SetRotation requires Vector3, not',typeof vector3);
-		SetRotationXYZ(vector3.x,vector3.y,vectory3.z);
+		this.SetRotationXYZ(vector3.x,vector3.y,vector3.z);
 	});
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 /*/	

@@ -1,6 +1,6 @@
 // add additional special modules used by this game //
 SYS1401.AddModulePath( 'keypress', 'vendor/Keypress/keypress-2.1.3.min' );
-SYS1401.AddModulePath( 'howler', 'vendor/howler/howler' );
+SYS1401.AddModulePath( 'howler', 'vendor/howler/howler', 'Howl' );
 SYS1401.AddModulePath( 'webrtc-shim', 'vendor/webrtc-adapter/adapter' );
 SYS1401.AddModulePath( 'socket-io', 'vendor-extra/socket.io' );
 SYS1401.UpdateModulePaths();

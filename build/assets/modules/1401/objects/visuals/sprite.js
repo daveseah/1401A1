@@ -274,7 +274,7 @@ define ([
 	you want. Use TextureDimensions() and SpriteDimensions() to get the 
 	native size of the sprite texture (spritesheet) or sprite base dimensions.
 /*/	InqSprite.method('ScaleXYZ', function () {
-		return { x: scale.x, y: scale.y, z: scale.z }; // for threeJS scaling
+		return { x: this.scale.x, y: this.scale.y, z: this.scale.z }; // for threeJS scaling
 	});
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	This is a universal scaling factor, separate from ScaleXYZ, for relative
