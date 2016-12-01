@@ -1,3 +1,4 @@
+// JSHINT CONFIGURATION
 {
 	"esversion": 6,
 	"undef" : true,
