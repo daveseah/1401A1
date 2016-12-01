@@ -178,16 +178,16 @@ define ([
 			this.Open(pish);
 		}
 		// execute the behavior code and check if it succeeded
-		state = this.Tick(pish, int_ms);
+		x_state = this.Tick(pish, int_ms);
 		// if the node isn't still running, then call "close"
-		if (state !== BaseNode.RUNNING) {
+		if (x_state !== BaseNode.RUNNING) {
 			this.BBSet(pish, BaseNode.IS_OPEN, false);
 			this.Close(pish);
 		}
 		// always call "exit"
 		this.Exit(pish);
 		// return state to whoever called Execute.
-		return state; 
+		return x_state; 
 	});
 
 

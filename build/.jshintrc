@@ -1,0 +1,22 @@
+{
+	"esversion": 6,
+	"undef" : true,
+	"browser" : true,
+	"devel" : true,
+	"jquery" : true,
+	"node" : true,
+	"globals" : {
+		// REQUIRE
+		"require" : false,
+		"requirejs" : false,
+		"define": false,
+		"THREE" : false,
+		"SYS1401" : true,
+		// WEBRTC
+		"RTCIceCandidate" : false,
+		"RTCPeerConnection" : false,
+		"RTCSessionDescription" : false,
+		"HTMLMediaElement" : false,
+		"MediaDevices" : false
+	}
+}
