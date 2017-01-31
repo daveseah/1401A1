@@ -1,4 +1,6 @@
-﻿define(function() {
+﻿define([
+    'bootstrap'                 // enables bootstrap accordians etc
+], function() {
     var ctor = function () {
         this.displayName = 'About This Project';
         this.description = '<a href="http://davidseah.com/about/make-video-game/">Project 1401</a> is my "make a game" learning project. The goal is to make a game that incorporates graphics, sound, and physics. It doesn\'t really matter that is is a GREAT game; I\'m hopeful that this project will be helpful to others learning how to build a web app/game in Javascript for modern browsers. Along the way I hope I have some fun and put this old dream to rest.';
