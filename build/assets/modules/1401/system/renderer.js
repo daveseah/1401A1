@@ -32,7 +32,8 @@ define ([
 	var CAPTURE_SCREEN = false;				// for screen capturing
 	var CAPTURE_CALLBACK = null;
 
-	var _prerender = [];					// registered render
+	var _prerender = [];					// registered outside renderhandler
+	var _postrender = [];					// registered outside renderhandler
 	var _heartbeat = [];					// registered renderer heartbeat
 
 	var i,j;								// pre-allocated indexers
@@ -83,14 +84,24 @@ define ([
 		_heartbeat.push(func);
 	};	
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Heartbeat Tasks execute during before GameStep every frame. This is used
-	by extenders of RENDERER to insert custom processing routines
+/*/	Extenders of RENDERER can add its own code BEFORE the renderloop
+	is drawn. 
 /*/	API.RegisterPrerenderTask = function ( func ) {
 		if (typeof func !== 'function') {
 			console.error("RegisterPrerenderTask requires a function");
 			return;
 		} 
 		_prerender.push(func);
+	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/	Extenders of RENDERER can add its own code AFTER the renderloop
+	is drawn.
+/*/	API.RegisterPostrenderTask = function ( func ) {
+		if (typeof func !== 'function') {
+			console.error("RegisterPostrenderTask requires a function");
+			return;
+		} 
+		_postrender.push(func);
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Capture
@@ -125,6 +136,10 @@ define ([
 
 		VIEWPORT.ClearDepth();
 		VIEWPORT.Render ( RP_OVER );
+
+		for(i=0;i<_postrender.length;i++) {
+			_postrender[i]();
+		}
 
 		// screen capture
 		if (CAPTURE_SCREEN) {
