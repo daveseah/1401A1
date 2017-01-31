@@ -62,7 +62,13 @@ define ([
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// Step 1. Initialize the WebGL surface and size containers exactly
-	Viewport.method('InitializeRenderer', function ( width, height, containerId ) {
+	Viewport.method('InitializeRenderer', function ( cfg ) {
+		// dereference required parameters
+		var width = cfg.renderWidth;
+		var height = cfg.renderHeight;
+		var containerId = cfg.attachId;
+
+		// error checking
 		if (this.webGL) {
 			console.error("Renderer already initialized");
 			return;
@@ -93,7 +99,8 @@ define ([
 		this.aspect 	= width / height;
 
 		// create renderer, then attach it
-		this.webGL = new THREE.WebGLRenderer();
+		// see THREE.WebGLRenderer for options you can add
+		this.webGL = new THREE.WebGLRenderer( cfg );
 		this.webGL.autoClear = false;
 		this.$container.append(this.webGL.domElement);
 

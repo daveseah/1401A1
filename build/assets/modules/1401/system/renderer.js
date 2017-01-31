@@ -50,17 +50,13 @@ define ([
 	renderWidth, renderHeight, attachTo are required
 	worldUnits is the number of worldUnits to fit into the pixel viewport
 	crossOrigin is to allow non-server media assets to load
-/*/	API.Initialize = function ( parm ) {
+/*/	API.Initialize = function ( cfg ) {
 		// order of initialization is important
-		VIEWPORT.InitializeRenderer(
-			parm.renderWidth,
-			parm.renderHeight,
-			parm.attachId
-		);
+		VIEWPORT.InitializeRenderer( cfg );
 
 		// using the renderWidth,Height as a 
 		VIEWPORT.SizeWorldToViewport(
-			parm.worldUnits || Math.min(parm.renderWidth, parm.renderHeight)
+			cfg.worldUnits || Math.min(cfg.renderWidth, cfg.renderHeight)
 		);
 		VIEWPORT.InitializeCameras();
 
@@ -72,7 +68,7 @@ define ([
 		RP_OVER.camera = VIEWPORT.ScreenCam();
 
 		// enable cross-origin
-		if (parm.crossOrigin===true)
+		if (cfg.crossOrigin===true)
 			THREE.ImageUtils.crossOrigin='';
 
 	};
