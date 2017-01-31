@@ -3,6 +3,7 @@ define ([
 	'1401/master',
 	'1401/js-extend/oop',		// returns empty object
 	'1401/js-extend/format',	// returns empty object
+	'bootstrap'					// enable menu dropdowns
 ], function (
 	MASTER,
 	js_oop,

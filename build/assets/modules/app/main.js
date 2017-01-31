@@ -30,7 +30,8 @@ if (window.SYS1401) {
 			'transitions' : 'vendor/durandal/js/transitions',
 			'knockout': 'vendor/knockout/knockout',
 			'bootstrap': 'vendor/bootstrap/js/bootstrap.min',
-			'jquery': 'vendor/jquery/jquery.min'
+			'jquery': 'vendor/jquery/jquery.min',
+            'jquery-ui': 'vendor/jquery-ui/jquery-ui.min'
 		},
 		shim: {
 			'bootstrap': {
