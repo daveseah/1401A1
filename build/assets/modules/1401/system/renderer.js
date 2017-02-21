@@ -31,7 +31,7 @@ define ([
 
 	var CAPTURE_SCREEN = false;				// for screen capturing
 	var CAPTURE_CALLBACK = null;
-	var CAPTURE_TYPE = 'image/png';
+	var CAPTURE_TYPE = 'image/jpeg';		// default image save type
 
 	var _prerender = [];					// registered outside renderhandler
 	var _postrender = [];					// registered outside renderhandler
@@ -112,7 +112,7 @@ define ([
 		if (typeof callback==='function') {
 			CAPTURE_CALLBACK = callback;
 		} else {
-			throw new Error('CaptureJPEG requires a callback function to receive jpg base64 data');
+			throw new Error('CaptureJPEG requires a callback function to receive base64 JPEG data');
 		}
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -132,7 +132,7 @@ define ([
 		if (typeof callback==='function') {
 			CAPTURE_CALLBACK = callback;
 		} else {
-			throw new Error('CaptureJPEG requires a callback function to receive jpg base64 data');
+			throw new Error('CaptureScreen requires a callback function to receive img base64 data, plus a imgtype specifier');
 		}
 	};
 
