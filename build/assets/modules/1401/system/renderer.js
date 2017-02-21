@@ -3,7 +3,7 @@ define ([
 	'three',
 	'1401/objects/viewport',
 	'1401/settings'
-], function ( 
+], function (
 	THREE,
 	VIEWPORT,
 	SETTINGS
@@ -31,6 +31,7 @@ define ([
 
 	var CAPTURE_SCREEN = false;				// for screen capturing
 	var CAPTURE_CALLBACK = null;
+	var CAPTURE_TYPE = 'image/png';
 
 	var _prerender = [];					// registered outside renderhandler
 	var _postrender = [];					// registered outside renderhandler
@@ -46,7 +47,7 @@ define ([
 
 ///	RENDER INIT & CONTROL ////////////////////////////////////////////////////
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Initialize Rendersystem 
+/*/	Initialize Rendersystem
 	displayMode is fixed, scaled, or fluid
 	renderWidth, renderHeight, attachTo are required
 	worldUnits is the number of worldUnits to fit into the pixel viewport
@@ -55,7 +56,7 @@ define ([
 		// order of initialization is important
 		VIEWPORT.InitializeRenderer( cfg );
 
-		// using the renderWidth,Height as a 
+		// using the renderWidth,Height as a
 		VIEWPORT.SizeWorldToViewport(
 			cfg.worldUnits || Math.min(cfg.renderWidth, cfg.renderHeight)
 		);
@@ -80,17 +81,17 @@ define ([
 		if (typeof func !== 'function') {
 			console.error("RegisterHeartBeat requires a function");
 			return;
-		} 
+		}
 		_heartbeat.push(func);
-	};	
+	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/	Extenders of RENDERER can add its own code BEFORE the renderloop
-	is drawn. 
+	is drawn.
 /*/	API.RegisterPrerenderTask = function ( func ) {
 		if (typeof func !== 'function') {
 			console.error("RegisterPrerenderTask requires a function");
 			return;
-		} 
+		}
 		_prerender.push(func);
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -100,19 +101,41 @@ define ([
 		if (typeof func !== 'function') {
 			console.error("RegisterPostrenderTask requires a function");
 			return;
-		} 
+		}
 		_postrender.push(func);
 	};
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/	Capture
+/*/	CaptureJPEG; superceded by CaptureScreen()
 /*/	API.CaptureJPEG = function ( callback ) {
 		CAPTURE_SCREEN = true;
+		CAPTURE_TYPE = 'image/jpeg';
 		if (typeof callback==='function') {
 			CAPTURE_CALLBACK = callback;
 		} else {
 			throw new Error('CaptureJPEG requires a callback function to receive jpg base64 data');
 		}
 	};
+///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/*/ Capture screen. Defaults to JPEG unless passing 'image/png'
+/*/	API.CaptureScreen = function ( callback, type ) {
+		type = type || 'image/jpeg';
+		switch (type) {
+			case 'image/jpeg': /* falls through */
+			case 'image/png':
+				break;
+			default:
+				console.error('RENDERER.CaptureJPEG: Unknown image type',type);
+				break;
+		}
+		CAPTURE_SCREEN = true;
+		CAPTURE_TYPE = type;
+		if (typeof callback==='function') {
+			CAPTURE_CALLBACK = callback;
+		} else {
+			throw new Error('CaptureJPEG requires a callback function to receive jpg base64 data');
+		}
+	};
+
 ///	- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ for manually rendering on every update with explicit call
 /*/	API.Render = function () {
@@ -144,9 +167,17 @@ define ([
 		// screen capture
 		if (CAPTURE_SCREEN) {
 			var buffer = VIEWPORT.WebGLCanvas();
-			var jpg = buffer.toDataURL( 'image/jpeg', 0.5 );
+			var img;
+			switch (CAPTURE_TYPE) {
+				case 'image/jpeg':
+					img = buffer.toDataURL( 'image/jpeg', 0.5 );
+					break;
+				case 'image/png':
+					img = buffer.toDataURL( 'image/png' );
+					break;
+			}
 			if (CAPTURE_CALLBACK) {
-				CAPTURE_CALLBACK.call( this, jpg );
+				CAPTURE_CALLBACK.call( this, img, CAPTURE_TYPE );
 				CAPTURE_CALLBACK = null;
 			}
 			CAPTURE_SCREEN = false;
@@ -270,7 +301,7 @@ define ([
 		BG_SPRITE = new THREE.Sprite(bgMat);
 		BG_SPRITE.position.set(0,0,-999); // clip for 2D is 1000
 		this.AddBackgroundVisual(BG_SPRITE);
-	
+
 		function mi_SaveHeight(texture) {
 			BG_SPRITE.scale.set(texture.image.width,texture.image.height,1);
 			if (callback) callback.call(callee, texture);
@@ -315,7 +346,7 @@ define ([
 	API.SubscribeToMousePicks = function ( func ) {
 
 		// make sure a function is provided
-		if (!(func instanceof Function)) return; 
+		if (!(func instanceof Function)) return;
 		// fail if EnableMousePicks() wasn't called first
 		if (!PICK_SUBSCRIBERS) {
 			console.error("Renderer.EnableMousePicks() must be called before subscribing");
@@ -355,10 +386,10 @@ define ([
 
 		/*/	NOTE:
 			we are using an orthographic camera setup that differs from most
-			orthographic example setups (not using screen coordinates), 
+			orthographic example setups (not using screen coordinates),
 			so the typical raycasting algorithms aren't working out of the box. Plus
 			our version of threeJS is R67, and raycasting changed in R69.
-			So I'm doing a 2D-only walk of our pieces 
+			So I'm doing a 2D-only walk of our pieces
 		/*/
 
 		var raycaster, dir;
