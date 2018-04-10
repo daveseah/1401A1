@@ -1,11 +1,11 @@
 /*//////////////////////////////// ABOUT \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*\
 
-	This is the main taskrunner for Engine 1401A1. 
+	This is the main taskrunner for Engine 1401A1.
 
 	From the command line, type...
 		gulp
 	...to execute the build-run-livereload cycle
- 
+
 \*\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ * //////////////////////////////////////*/
 
 	// modules
@@ -57,7 +57,7 @@
 		return del(PUBLIC);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ Install bower dependencies in bower.json 
+/*/ Install bower dependencies in bower.json
 	NOTE: this is always async in Gulp 3, so need to use run-sequence to wait
 	for all bower installs to complete when including this task as dependency
 /*/	gulp.task('bower-get', function () {
@@ -93,7 +93,7 @@
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ Copy extra framework modules and assets from bower_components. 
+/*/ Copy extra framework modules and assets from bower_components.
 	Use copy-frame-assets as an example
 /*/	gulp.task('copy-more-bower-assets', function () {
 		// add additional bower_component libraries
@@ -108,7 +108,7 @@
 			gulp.src(BOWER+'physicsjs/dist/*.js').pipe(gulp.dest(VENDOR+'physicsjs')),
 			// copy webrtc shims
 			gulp.src(BOWER+'webrtc-adapter/release/adapter.js').pipe(gulp.dest(VENDOR+'webrtc-adapter'))
-			// NOTE: For libraries are not bower-managed, save them in 
+			// NOTE: For libraries are not bower-managed, save them in
 			// modules/vendor-extra and they will be copied over in 'copy-assets'
 		);
 	});
@@ -140,7 +140,7 @@
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /*/ Example of concatenation (not used)
 /*/	gulp.task('example-concat', function () {
-		return merge ( 
+		return merge (
 		    // note: add additional gulp pipes at top, not bottom //
 			gulp.src([
 					ASSETS+'modules/vendor_extra/*.css'
@@ -150,9 +150,9 @@
 		);
 	});
 /// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-/*/ Gather and build all files to public 
+/*/ Gather and build all files to public
 /*/	gulp.task('build', function ( callback ) {
-		runseq ( 
+		runseq (
 			'bower-get',
 			[
 				'copy-bower-assets',
@@ -224,7 +224,7 @@
 				// exec('pkill '+stdout, function(err,stdout,stdin) {});
 			} else {
 				// fork the 1401 process
-				server1401 = spawn( progname, args, opt, 
+				server1401 = spawn( progname, args, opt,
 					function( err, stdout, stderr ) {
 						console.log('callback from spawn');
 						if (err) console.log(err);
@@ -268,7 +268,7 @@
 						}, delay);
 					}, delay);
 				});
-				
+
 			} // else stdout
 		}); // exec callback
 	}
